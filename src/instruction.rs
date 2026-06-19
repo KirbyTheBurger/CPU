@@ -16,41 +16,6 @@ impl Encode for u16 {
     }
 }
 
-macro_rules! pattern {
-    ($variant:ident($($field:ty),*)) => {
-        Instruction::$variant(..)
-    };
-
-    ($variant:ident) => {
-        Instruction::$variant
-    };
-}
-
-macro_rules! encode_fields {
-    ($path:path, $bytes:ident) => {
-        $path() => {}
-    };
-
-    ($path:path, $bytes:ident, $t0:ty) => {
-        $path(a) => { $bytes.extend(a.encode()); }
-    };
-
-    ($path:path, $bytes:ident, $t0:ty, $t1:ty) => {
-        $path(a, b) => {
-            $bytes.extend(a.encode());
-            $bytes.extend(b.encode());
-        }
-    };
-
-    ($path:path, $bytes:ident, $t0:ty, $t1:ty, $t2:ty) => {
-        $path(a, b, c) => {
-            $bytes.extend(a.encode());
-            $bytes.extend(b.encode());
-            $bytes.extend(c.encode());
-        }
-    };
-}
-
 macro_rules! instructions {
     (
         $(
