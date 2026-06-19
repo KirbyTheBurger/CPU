@@ -5,6 +5,7 @@ use crate::assembler::Assembler;
 mod cpu;
 mod assembler;
 mod error;
+mod instruction;
 
 fn main() {
     let input = get_input();

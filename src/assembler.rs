@@ -1,17 +1,8 @@
 use std::fmt::Display;
 
-use crate::error::Error::{self, *};
+use crate::{error::Error::{self, *}, instruction::Instruction::{self, *}};
 
-use Instruction::*;
 use Operand::*;
-
-#[derive(Debug)]
-pub enum Instruction {
-    LDrn(u8, u16),
-    LDrr(u8, u8),
-    LDran(u8, u16),
-    LDrar(u8, u8),
-}
 
 #[derive(Debug, Clone, Copy)]
 pub enum Operand {
