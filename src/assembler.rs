@@ -1,6 +1,9 @@
+use std::fmt::Display;
+
 use crate::error::Error::{self, *};
 
 use Instruction::*;
+use Operand::*;
 
 #[derive(Debug)]
 pub enum Instruction {
@@ -8,6 +11,14 @@ pub enum Instruction {
     LDrr(u8, u8),
     LDran(u8, u16),
     LDrar(u8, u8),
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum Operand {
+    Register(u8),
+    Number(u16),
+    RegAddress(u8),
+    NumAdress(u16),
 }
 
 pub struct Assembler {
@@ -46,38 +57,102 @@ impl Assembler {
                     self.advance();
                     self.skip_whitespace();
 
-                    if !matches!(self.current()?, 'r') {
-                        return throw(ExpectedReg);
-                    }
-
-                    let ra = match self.parse_reg() {
-                        Ok(r) => r,
+                    let args = match self.parse_args(2) {
+                        Ok(a) => a,
                         Err(e) => return throw(e),
                     };
-                    self.skip_whitespace();
 
-                    if !matches!(self.current()?, ',') {
-                        return throw(MissingArgSeperator);
-                    }
-                    self.advance();
-                    self.skip_whitespace();
+                    let rx = match args[0] {
+                        Register(r) => r,
+                        _ => return throw(ExpectedReg),
+                    };
 
-                    match self.current()? {
-                        'r' => {
-                            let rb = match self.parse_reg() {
-                                Ok(r) => r,
-                                Err(e) => return throw(e),
-                            };
-
-                            return Some(Ok(LDrr(ra, rb)));
-                        },
-                        _ => todo!()
+                    match args[1] {
+                        Register(ry) => instr(LDrr(rx, ry)),
+                        Number(n) => instr(LDrn(rx, n)),
+                        RegAddress(ry) => instr(LDrar(rx, ry)),
+                        NumAdress(n) => instr(LDran(rx, n)),
                     }
                 }
                 _ => todo!()
             }
             _ => todo!()
         }
+    }
+
+    fn parse_args(&mut self, amount: u8) -> Result<Vec<Operand>, Error> {
+        let mut args = vec![];
+
+        self.skip_whitespace();
+
+        for i in 0..amount {
+            let current = *match self.current() {
+                Some(c) => c,
+                None => return Err(NotEnoughArgs)
+            };
+
+            match current {
+                'r' => {
+                    let reg = match self.parse_reg() {
+                        Ok(r) => r,
+                        Err(e) => return Err(e),
+                    };
+                    args.push(Register(reg));
+                },
+                '[' => {
+                    self.advance();
+                    let addr = self.parse_args(1)?[0];
+
+                    match self.current() {
+                        Some(']') => self.advance(),
+                        Some(c) => return Err(BracketCloseExpected(*c)),
+                        None => return Err(BracketCloseEOF),
+                    }
+
+                    match addr {
+                        Register(r) => args.push(RegAddress(r)),
+                        Number(n) => args.push(NumAdress(n)),
+                        _ => return Err(InvalidAddr(addr))
+                    }
+                },
+                c if c.is_numeric() => {
+                    let mut s = String::from(c);
+                    loop {
+                        self.advance();
+                        let current = match self.current() {
+                            Some(c) => c,
+                            None => break,
+                        };
+                        if current.is_numeric() {
+                            s.push(c);
+                        } else {
+                            break;
+                        }
+                    }
+
+                    let num = match s.parse::<u16>() {
+                        Ok(n) => n,
+                        Err(_) => return Err(NumAboveCap(s)),
+                    };
+                    args.push(Number(num));
+                },
+                _ => return Err(InvalidArg),
+            }
+
+            if i == amount - 1 {
+                break;
+            }
+
+            self.skip_whitespace();
+
+            if !matches!(self.current(), Some(',')) {
+                return Err(MissingArgSeperator);
+            }
+            self.advance();
+            self.skip_whitespace();
+        }
+
+        Ok(args)
     }
 
     fn parse_reg(&mut self) -> Result<u8, Error> {
@@ -119,4 +194,19 @@ impl Assembler {
 
 fn throw(err: Error) -> Option<Result<Instruction, Error>> {
     Some(Err(err))
+}
+
+fn instr(i: Instruction) -> Option<Result<Instruction, Error>> {
+    Some(Ok(i))
+}
+
+impl Display for Operand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Register(r) => write!(f, "r{r}"),
+            Number(n) => write!(f, "{n}"),
+            RegAddress(r) => write!(f, "[r{r}]"),
+            NumAdress(n) => write!(f, "[{n}]"),
+        }
+    }
 }
