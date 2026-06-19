@@ -58,7 +58,7 @@ macro_rules! instructions {
         ),* $(,)?
     ) => {
         paste! {
-            #[derive(Debug)]
+            #[derive(Debug, Clone, Copy)]
             pub enum Instruction {
                 $( $variant $( ( $t0 $(, $t1 $(, $t2)? )? ) )? ),*
             }

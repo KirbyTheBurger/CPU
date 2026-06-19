@@ -1,11 +1,12 @@
 use std::io::stdin;
 
-use crate::assembler::Assembler;
+use crate::{assembler::Assembler, encoder::Encoder};
 
 mod cpu;
 mod assembler;
 mod error;
 mod instruction;
+mod encoder;
 
 fn main() {
     let input = get_input();
@@ -19,6 +20,10 @@ fn main() {
         },
     };
     println!("{:?}", instructions);
+
+    let mut encoder = Encoder::new(instructions);
+    let program = encoder.encode();
+    println!("{:?}", program);
 }
 
 fn get_input() -> String {
