@@ -5,7 +5,7 @@
 |rx       |register x|
 |n        |number   |
 |[n]      |value at memory adress n|
-|[rx]     |value at memory adress stored in rx]
+|[rx]     |value at memory adress stored in rx|
 
 **Instructions:**
 | Opcode | Mnemonic | Operands |
