@@ -1,6 +1,6 @@
 use std::io::stdin;
 
-use crate::{assembler::Assembler, encoder::Encoder};
+use crate::{assembler::Assembler, cpu::CPU, encoder::Encoder};
 
 mod cpu;
 mod assembler;
@@ -15,7 +15,7 @@ fn main() {
     let instructions = match assembler.process() {
         Ok(i) => i,
         Err(e) => {
-            println!("{e}");
+            println!("An error ocurred while parsing the assembly: {e}");
             return;
         },
     };
@@ -24,6 +24,15 @@ fn main() {
     let mut encoder = Encoder::new(instructions);
     let program = encoder.encode();
     println!("{:?}", program);
+
+    let mut cpu = CPU::new();
+    if let Err(e) = cpu.load(program) {
+        println!("An error ocurred while loading the program into memory: {e}");
+    }
+    if let Err(e) = cpu.run(true) {
+        println!("An error ocurred during execution: {e}");
+    }
+
 }
 
 fn get_input() -> String {

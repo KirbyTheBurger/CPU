@@ -11,12 +11,12 @@ pub enum Error {
     MissingRegIndex,
     MissingArgSeperator,
     NotEnoughArgs,
-    UnexpectedArg(Operand),
     InvalidAddr(Operand),
     InvalidArg,
     BracketCloseExpected(char),
     BracketCloseEOF,
     NumAboveCap(String),
+    PcAboveCap,
 }
 
 impl Display for Error {
@@ -27,12 +27,12 @@ impl Display for Error {
             MissingRegIndex => write!(f, "Missing register index"),
             MissingArgSeperator => write!(f, "Missing argument seperator `,`"),
             NotEnoughArgs => write!(f, "Not enough arguments supplied"),
-            UnexpectedArg(o) => write!(f, "Unexpected argument `{}`", *o),
             InvalidAddr(o) => write!(f, "Invalid memory adress `{}`", *o),
             InvalidArg => write!(f, "Invalid argument"),
             BracketCloseExpected(c) => write!(f, "Expected `]`, got `{c}`"),
             BracketCloseEOF => write!(f, "Expected `]`, got `EOF`"),
             NumAboveCap(n) => write!(f, "Number `{n}` is greater than 65535"),
+            PcAboveCap => write!(f, "Program counter is greater than 65535"),
         }
     }
 }

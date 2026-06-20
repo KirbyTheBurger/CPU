@@ -9,7 +9,6 @@ pub enum Operand {
     Register(u8),
     Number(u16),
     RegAddress(u8),
-    NumAdress(u16),
 }
 
 pub struct Assembler {
@@ -30,9 +29,11 @@ impl Assembler {
 
         self.skip_whitespace();
 
-        while let Some(&c) = self.current() {
-            if let Some(i) = self.process_instruction(c) {
+        loop {
+            if let Some(i) = self.process_instruction() {
                 instr.push(i?);
+            } else {
+                break;
             }
 
             self.skip_whitespace();
@@ -41,32 +42,28 @@ impl Assembler {
         Ok(instr)
     }
 
-    fn process_instruction(&mut self, c: char) -> Option<Result<Instruction, Error>> {
-        match c {
-            'L' => match self.next()? {
-                'D' => {
-                    self.advance();
-                    self.skip_whitespace();
+    fn process_instruction(&mut self) -> Option<Result<Instruction, Error>> {
+        match self.read_word()?.as_str() {
+            "LD" => {
+                let args = match self.parse_args(2) {
+                    Ok(a) => a,
+                    Err(e) => return throw(e),
+                };
 
-                    let args = match self.parse_args(2) {
-                        Ok(a) => a,
-                        Err(e) => return throw(e),
-                    };
+                let rx = match args[0] {
+                    Register(r) => r,
+                    _ => return throw(ExpectedReg),
+                };
 
-                    let rx = match args[0] {
-                        Register(r) => r,
-                        _ => return throw(ExpectedReg),
-                    };
-
-                    match args[1] {
-                        Register(ry) => instr(LDrr(rx, ry)),
-                        Number(n) => instr(LDrn(rx, n)),
-                        RegAddress(ry) => instr(LDrar(rx, ry)),
-                        NumAdress(n) => instr(LDran(rx, n)),
-                    }
+                match args[1] {
+                    Register(ry) => instr(LDrr(rx, ry)),
+                    Number(n) => instr(LDrn(rx, n)),
+                    RegAddress(ry) => instr(LDrar(rx, ry)),
                 }
-                _ => todo!()
-            }
+            },
+            "HLT" => {
+                instr(HLT)
+            },
             _ => todo!()
         }
     }
@@ -102,7 +99,6 @@ impl Assembler {
 
                     match addr {
                         Register(r) => args.push(RegAddress(r)),
-                        Number(n) => args.push(NumAdress(n)),
                         _ => return Err(InvalidAddr(addr))
                     }
                 },
@@ -144,6 +140,22 @@ impl Assembler {
         }
 
         Ok(args)
+    }
+
+    fn read_word(&mut self) -> Option<String> {
+        let mut s = String::new();
+
+        loop {
+            let c = self.current()?;
+            if c.is_whitespace() {
+                self.skip_whitespace();
+                break;
+            }
+            s.push(*c);
+            self.advance();
+        }
+
+        Some(s)
     }
 
     fn parse_reg(&mut self) -> Result<u8, Error> {
@@ -197,7 +209,6 @@ impl Display for Operand {
             Register(r) => write!(f, "r{r}"),
             Number(n) => write!(f, "{n}"),
             RegAddress(r) => write!(f, "[r{r}]"),
-            NumAdress(n) => write!(f, "[{n}]"),
         }
     }
 }
