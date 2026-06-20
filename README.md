@@ -17,5 +17,5 @@
 **Mnemonics**  
 | Mnemonic | Meaning |
 |----------|---------|
-|HLT       |Stops the current program|
+|HLT       |Stop the current program|
 |LD        |Load value into register|
