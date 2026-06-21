@@ -15,9 +15,11 @@
 |0x02    |LD        |rx, ry    |
 |0x03    |LD        |rx, [ry]  |
 |0x04    |LD        |rx, [n]   |
+|0x05    |ST        |[rx], ry  |
 
 **Mnemonics**  
 | Mnemonic | Meaning |
 |----------|---------|
 |HLT       |Stop the current program|
 |LD        |Load value into register|
+|ST        |Store value in memory|

@@ -64,10 +64,24 @@ impl CPU {
                 let n = self.get_addr(a);
                 self.set_reg(rx, n);
             },
+            0x05 => {
+                let rx = self.next_byte();
+                let ry = self.next_byte();
+                self.set_addr(rx, ry);
+            }
             _ => todo!(),
         }
 
         self.advance();
+    }
+
+    fn set_addr(&mut self, arx: u8, ry: u8) {
+        let a = self.get_reg(arx);
+        let n = self.get_reg(ry);
+        let b = n.to_be_bytes();
+
+        self.mem[a as usize] = b[0];
+        self.mem[a.wrapping_add(1) as usize] = b[1];
     }
 
     fn get_addr(&self, n: u16) -> u16 {

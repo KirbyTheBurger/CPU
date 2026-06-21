@@ -17,6 +17,24 @@ pub struct Assembler {
     pos: usize,
 }
 
+macro_rules! args {
+    ($self:expr, $n:expr) => {
+        match $self.parse_args($n) {
+            Ok(a) => a,
+            Err(e) => return throw(e),
+        }
+    };
+}
+
+macro_rules! ensure {
+    ($arg:expr, $expected:ident, $err:expr) => {
+        match $arg {
+            $expected(x) => x,
+            _ => return throw($err),
+        }
+    };
+}
+
 impl Assembler {
     pub fn new(input: String) -> Assembler {
         Assembler {
@@ -46,15 +64,8 @@ impl Assembler {
     fn process_instruction(&mut self) -> Option<Result<Instruction, Error>> {
         match self.read_word()?.as_str() {
             "LD" => {
-                let args = match self.parse_args(2) {
-                    Ok(a) => a,
-                    Err(e) => return throw(e),
-                };
-
-                let rx = match args[0] {
-                    Register(r) => r,
-                    _ => return throw(ExpectedReg),
-                };
+                let args = args!(self, 2);
+                let rx = ensure!(args[0], Register, ExpectedReg);
 
                 match args[1] {
                     Register(ry) => instr(LDrr(rx, ry)),
@@ -66,6 +77,13 @@ impl Assembler {
             "HLT" => {
                 instr(HLT)
             },
+            "ST" => {
+                let args = args!(self, 2);
+                let rx = ensure!(args[0], RegAddress, ExpectedReg);
+                let ry = ensure!(args[1], Register, ExpectedReg);
+
+                instr(ST(rx, ry))
+            }
             _ => todo!()
         }
     }

@@ -71,4 +71,5 @@ instructions!(
     LDrr(u8, u8) = 0x02,
     LDrar(u8, u8) = 0x03,
     LDran(u8, u16) = 0x04,
+    ST(u8, u8) = 0x05,
 );
