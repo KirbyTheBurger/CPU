@@ -2,9 +2,10 @@
 **Operands:**  
 | Operand | Meaning |
 |---------|---------|
-|rx       |register x|
-|n        |number   |
-|[rx]     |value at memory adress stored in rx|
+|rx       |Register x|
+|n        |Number   |
+|[rx]     |Value at memory adress stored in rx|
+|[n]      |Value at memory adress n|
 
 **Instructions:**  
 | Opcode | Mnemonic | Operands |
@@ -13,6 +14,7 @@
 |0x01    |LD        |rx, n     |
 |0x02    |LD        |rx, ry    |
 |0x03    |LD        |rx, [ry]  |
+|0x04    |LD        |rx, [n]   |
 
 **Mnemonics**  
 | Mnemonic | Meaning |

@@ -26,12 +26,8 @@ fn main() {
     println!("{:?}", program);
 
     let mut cpu = CPU::new();
-    if let Err(e) = cpu.load(program) {
-        println!("An error ocurred while loading the program into memory: {e}");
-    }
-    if let Err(e) = cpu.run(true) {
-        println!("An error ocurred during execution: {e}");
-    }
+    cpu.load(program);
+    cpu.run(true);
 
 }
 

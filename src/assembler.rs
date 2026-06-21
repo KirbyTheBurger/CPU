@@ -9,6 +9,7 @@ pub enum Operand {
     Register(u8),
     Number(u16),
     RegAddress(u8),
+    Adress(u16),
 }
 
 pub struct Assembler {
@@ -59,6 +60,7 @@ impl Assembler {
                     Register(ry) => instr(LDrr(rx, ry)),
                     Number(n) => instr(LDrn(rx, n)),
                     RegAddress(ry) => instr(LDrar(rx, ry)),
+                    Adress(n) => instr(LDran(rx, n)),
                 }
             },
             "HLT" => {
@@ -99,6 +101,7 @@ impl Assembler {
 
                     match addr {
                         Register(r) => args.push(RegAddress(r)),
+                        Number(n) => args.push(Adress(n)),
                         _ => return Err(InvalidAddr(addr))
                     }
                 },
@@ -209,6 +212,7 @@ impl Display for Operand {
             Register(r) => write!(f, "r{r}"),
             Number(n) => write!(f, "{n}"),
             RegAddress(r) => write!(f, "[r{r}]"),
+            Adress(n) => write!(f, "[{n}]"),
         }
     }
 }

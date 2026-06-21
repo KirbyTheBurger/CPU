@@ -1,5 +1,3 @@
-use crate::error::Error::{self, *};
-
 pub struct CPU {
     pub reg: [u16; 8],
     pub mem: [u8; 0xFFFF],
@@ -17,74 +15,83 @@ impl CPU {
         }
     }
 
-    pub fn load(&mut self, program: Vec<u8>) -> Result<(), Error> {
+    pub fn load(&mut self, program: Vec<u8>) {
         for b in program {
             self.mem[self.pc as usize] = b;
-            self.advance()?;
+            self.advance();
         }
         
         self.pc = 0;
-        Ok(())
     }
 
-    pub fn run(&mut self, debug: bool) -> Result<(), Error> {
+    pub fn run(&mut self, debug: bool) {
         self.running = true;
 
         while self.running {
-            self.run_instruction()?;
+            self.run_instruction();
 
             if debug {
                 println!("registers: {:?}\npc: {}\nrunning: {}", self.reg, self.pc, self.running);
             }
         }
-
-        Ok(())
     }
 
-    fn run_instruction(&mut self) -> Result<(), Error> {
+    fn run_instruction(&mut self) {
         match self.current() {
             0x00 => {
                 self.running = false;
             }
             0x01 => {
-                let rx = self.next_byte()?;
-                let n = self.next_u16()?;
+                let rx = self.next_byte();
+                let n = self.next_u16();
                 self.set_reg(rx, n);
             },
             0x02 => {
-                let rx = self.next_byte()?;
-                let ry = self.next_byte()?;
+                let rx = self.next_byte();
+                let ry = self.next_byte();
                 let n = self.get_reg(ry);
                 self.set_reg(rx, n);
             },
             0x03 => {
-                let rx = self.next_byte()?;
-                let ry = self.next_byte()?;
-                let n = self.get_addr(ry);
-                self.set_reg(rx, n as u16);
+                let rx = self.next_byte();
+                let ry = self.next_byte();
+                let n = self.get_reg_addr(ry);
+                self.set_reg(rx, n);
+            },
+            0x04 => {
+                let rx = self.next_byte();
+                let a = self.next_u16();
+                let n = self.get_addr(a);
+                self.set_reg(rx, n);
             },
             _ => todo!(),
         }
 
-        self.advance()?;
-        Ok(())
+        self.advance();
     }
 
-    fn get_addr(&self, r: u8) -> u8 {
+    fn get_addr(&self, n: u16) -> u16 {
+        let b0 = self.mem[n as usize];
+        let b1 = self.mem[n.wrapping_add(1) as usize];
+
+        u16::from_be_bytes([b0, b1])
+    }
+
+    fn get_reg_addr(&self, r: u8) -> u16 {
         let n = self.get_reg(r);
-        self.mem[n as usize]
+        self.get_addr(n)
     }
 
-    fn next_byte(&mut self) -> Result<u8, Error> {
-        self.advance()?;
-        Ok(self.current())
+    fn next_byte(&mut self) -> u8 {
+        self.advance();
+        self.current()
     }
 
-    fn next_u16(&mut self) -> Result<u16, Error> {
-        let b0 = self.next_byte()?;
-        let b1 = self.next_byte()?;
+    fn next_u16(&mut self) -> u16 {
+        let b0 = self.next_byte();
+        let b1 = self.next_byte();
 
-        Ok(u16::from_be_bytes([b0, b1]))
+        u16::from_be_bytes([b0, b1])
     }
 
     fn set_reg(&mut self, r: u8, v: u16) {
@@ -95,12 +102,9 @@ impl CPU {
         self.reg[r as usize]
     }
 
-    fn advance(&mut self) -> Result<(), Error> {
+    fn advance(&mut self) {
         if self.pc != 0xFFFF {
-            self.pc += 1;
-            Ok(())
-        } else {
-            Err(PcAboveCap)
+            self.pc = self.pc.wrapping_add(1);
         }
     }
 

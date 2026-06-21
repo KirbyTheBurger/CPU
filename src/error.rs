@@ -16,7 +16,6 @@ pub enum Error {
     BracketCloseExpected(char),
     BracketCloseEOF,
     NumAboveCap(String),
-    PcAboveCap,
 }
 
 impl Display for Error {
@@ -32,7 +31,6 @@ impl Display for Error {
             BracketCloseExpected(c) => write!(f, "Expected `]`, got `{c}`"),
             BracketCloseEOF => write!(f, "Expected `]`, got `EOF`"),
             NumAboveCap(n) => write!(f, "Number `{n}` is greater than 65535"),
-            PcAboveCap => write!(f, "Program counter is greater than 65535"),
         }
     }
 }

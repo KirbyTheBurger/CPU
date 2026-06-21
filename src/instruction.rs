@@ -70,4 +70,5 @@ instructions!(
     LDrn(u8, u16) = 0x01,
     LDrr(u8, u8) = 0x02,
     LDrar(u8, u8) = 0x03,
+    LDran(u8, u16) = 0x04,
 );
