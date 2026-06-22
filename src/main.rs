@@ -1,12 +1,6 @@
 use std::io::stdin;
 
-use crate::{assembler::Assembler, cpu::CPU, encoder::Encoder};
-
-mod cpu;
-mod assembler;
-mod error;
-mod instruction;
-mod encoder;
+use cpu::{assembler::Assembler, cpu::CPU, encoder::Encoder};
 
 fn main() {
     let input = get_input();
@@ -27,7 +21,7 @@ fn main() {
 
     let mut cpu = CPU::new();
     cpu.load(program);
-    cpu.run(true);
+    cpu.run(false);
 
 }
 

@@ -239,7 +239,7 @@ impl Assembler {
             Some(c) => *c,
             None => return Err(MissingRegIndex),
         };
-        if matches!(next, '0'..'7') {
+        if matches!(next, '0'..='7') {
             self.advance();
             Ok(next as u8 - b'0')
         } else {
