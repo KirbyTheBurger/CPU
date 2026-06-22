@@ -67,9 +67,18 @@ macro_rules! instructions {
 
 instructions!(
     HLT = 0x00,
+
     LDrn(u8, u16) = 0x01,
     LDrr(u8, u8) = 0x02,
     LDrar(u8, u8) = 0x03,
     LDran(u8, u16) = 0x04,
+
     ST(u8, u8) = 0x05,
+
+    ADDrr(u8, u8) = 0x06,
+    ADDrn(u8, u16) = 0x07,
+    SUBrr(u8, u8) = 0x08,
+    SUBrn(u8, u16) = 0x09,
+    MUL(u8, u8) = 0x0A,
+    DIV(u8, u8) = 0x0B,
 );

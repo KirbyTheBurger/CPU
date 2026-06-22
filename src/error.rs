@@ -7,6 +7,9 @@ use crate::assembler::Operand;
 #[derive(Debug)]
 pub enum Error {
     ExpectedReg,
+    ExpectedRegAddr,
+    ExpectedNum,
+
     InvalidReg(char),
     MissingRegIndex,
     MissingArgSeperator,
@@ -21,7 +24,7 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ExpectedReg => write!(f, "Invalid argument, expected register"),
+            ExpectedReg => write!(f, "Invalid argument, expected a register"),
             InvalidReg(c) => write!(f, "Invalid register: register `{c}` does not exist"),
             MissingRegIndex => write!(f, "Missing register index"),
             MissingArgSeperator => write!(f, "Missing argument seperator `,`"),
@@ -31,6 +34,8 @@ impl Display for Error {
             BracketCloseExpected(c) => write!(f, "Expected `]`, got `{c}`"),
             BracketCloseEOF => write!(f, "Expected `]`, got `EOF`"),
             NumAboveCap(n) => write!(f, "Number `{n}` is greater than 65535"),
+            ExpectedNum => write!(f, "Invalid argument, expected a number"),
+            ExpectedRegAddr => write!(f, "Invalid argument, expected a register containing a memory adress"),
         }
     }
 }

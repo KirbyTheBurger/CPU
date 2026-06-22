@@ -48,14 +48,12 @@ impl CPU {
             },
             0x02 => {
                 let rx = self.next_byte();
-                let ry = self.next_byte();
-                let n = self.get_reg(ry);
+                let n = self.next_reg();
                 self.set_reg(rx, n);
             },
             0x03 => {
                 let rx = self.next_byte();
-                let ry = self.next_byte();
-                let n = self.get_reg_addr(ry);
+                let n = self.next_reg_addr();
                 self.set_reg(rx, n);
             },
             0x04 => {
@@ -68,15 +66,56 @@ impl CPU {
                 let rx = self.next_byte();
                 let ry = self.next_byte();
                 self.set_addr(rx, ry);
-            }
+            },
+            0x06 => {
+                let rx = self.next_byte();
+                let n1 = self.get_reg(rx);
+                let n2 = self.next_reg();
+                self.set_reg(rx, n1 + n2);
+            },
+            0x07 => {
+                let rx = self.next_byte();
+                let n1 = self.get_reg(rx);
+                let n2 = self.next_u16();
+                self.set_reg(rx, n1 + n2);
+            },
+            0x08 => {
+                let rx = self.next_byte();
+                let n1 = self.get_reg(rx);
+                let n2 = self.next_reg();
+                self.set_reg(rx, n1 - n2);
+            },
+            0x09 => {
+                let rx = self.next_byte();
+                let n1 = self.get_reg(rx);
+                let n2 = self.next_u16();
+                self.set_reg(rx, n1 - n2);
+            },
+            0x0A => {
+                let rx = self.next_byte();
+                let n1 = self.get_reg(rx);
+                let n2 = self.next_reg();
+                self.set_reg(rx, n1 * n2);
+            },
+            0x0B => {
+                let rx = self.next_byte();
+                let n1 = self.get_reg(rx);
+                let n2 = self.next_reg();
+                self.set_reg(rx, n1 / n2);
+            },
             _ => todo!(),
         }
 
         self.advance();
     }
 
-    fn set_addr(&mut self, arx: u8, ry: u8) {
-        let a = self.get_reg(arx);
+    fn next_reg(&mut self) -> u16 {
+        let r = self.next_byte();
+        self.get_reg(r)
+    }
+
+    fn set_addr(&mut self, rx: u8, ry: u8) {
+        let a = self.get_reg(rx);
         let n = self.get_reg(ry);
         let b = n.to_be_bytes();
 
@@ -91,8 +130,8 @@ impl CPU {
         u16::from_be_bytes([b0, b1])
     }
 
-    fn get_reg_addr(&self, r: u8) -> u16 {
-        let n = self.get_reg(r);
+    fn next_reg_addr(&mut self) -> u16 {
+        let n = self.next_reg();
         self.get_addr(n)
     }
 

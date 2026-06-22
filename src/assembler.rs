@@ -8,7 +8,7 @@ use Operand::*;
 pub enum Operand {
     Register(u8),
     Number(u16),
-    RegAddress(u8),
+    RegAdress(u8),
     Adress(u16),
 }
 
@@ -26,11 +26,32 @@ macro_rules! args {
     };
 }
 
+/**
+    Macro for ensuring a argument is valid, will throw the appropiate error if not.
+    Possible inputs:
+    - reg: throws `ExpectedReg`
+    - num: throws `ExpectedNum`
+    - regaddr: throws `ExpectedRegAddr`
+*/
 macro_rules! ensure {
-    ($arg:expr, $expected:ident, $err:expr) => {
+    ($arg:expr, reg) => {
         match $arg {
-            $expected(x) => x,
-            _ => return throw($err),
+            Register(x) => x,
+            _ => return throw(ExpectedReg),
+        }
+    };
+
+    ($arg:expr, num) => {
+        match $arg {
+            Number(x) => x,
+            _ => return throw(ExpectedNum),
+        }
+    };
+    
+    ($arg:expr, regaddr) => {
+        match $arg {
+            RegAdress(x) => x,
+            _ => return throw(ExpectedRegAddr),
         }
     };
 }
@@ -62,15 +83,18 @@ impl Assembler {
     }
 
     fn process_instruction(&mut self) -> Option<Result<Instruction, Error>> {
-        match self.read_word()?.as_str() {
+        let word = self.read_word()?;
+        let word = word.as_str();
+
+        match word {
             "LD" => {
                 let args = args!(self, 2);
-                let rx = ensure!(args[0], Register, ExpectedReg);
+                let rx = ensure!(args[0], reg);
 
                 match args[1] {
                     Register(ry) => instr(LDrr(rx, ry)),
                     Number(n) => instr(LDrn(rx, n)),
-                    RegAddress(ry) => instr(LDrar(rx, ry)),
+                    RegAdress(ry) => instr(LDrar(rx, ry)),
                     Adress(n) => instr(LDran(rx, n)),
                 }
             },
@@ -79,11 +103,42 @@ impl Assembler {
             },
             "ST" => {
                 let args = args!(self, 2);
-                let rx = ensure!(args[0], RegAddress, ExpectedReg);
-                let ry = ensure!(args[1], Register, ExpectedReg);
+                let rx = ensure!(args[0], regaddr);
+                let ry = ensure!(args[1], reg);
 
                 instr(ST(rx, ry))
-            }
+            },
+            "ADD" => {
+                let args = args!(self, 2);
+                let rx = ensure!(args[0], reg);
+
+                match args[1] {
+                    Register(ry) => instr(ADDrr(rx, ry)),
+                    Number(n) => instr(ADDrn(rx, n)),
+                    _ => throw(InvalidArg),
+                }
+            },
+            "SUB" => {
+                let args = args!(self, 2);
+                let rx = ensure!(args[0], reg);
+
+                match args[1] {
+                    Register(ry) => instr(SUBrr(rx, ry)),
+                    Number(n) => instr(SUBrn(rx, n)),
+                    _ => throw(InvalidArg),
+                }
+            },
+            "MUL" | "DIV" => {
+                let args = args!(self, 2);
+                let rx = ensure!(args[0], reg);
+                let ry = ensure!(args[1], reg);
+
+                match word {
+                    "MUL" => instr(MUL(rx, ry)),
+                    "DIV" => instr(DIV(rx, ry)),
+                    _ => unreachable!()
+                }
+            },
             _ => todo!()
         }
     }
@@ -118,7 +173,7 @@ impl Assembler {
                     }
 
                     match addr {
-                        Register(r) => args.push(RegAddress(r)),
+                        Register(r) => args.push(RegAdress(r)),
                         Number(n) => args.push(Adress(n)),
                         _ => return Err(InvalidAddr(addr))
                     }
@@ -132,7 +187,7 @@ impl Assembler {
                             None => break,
                         };
                         if current.is_numeric() {
-                            s.push(c);
+                            s.push(*current);
                         } else {
                             break;
                         }
@@ -229,7 +284,7 @@ impl Display for Operand {
         match self {
             Register(r) => write!(f, "r{r}"),
             Number(n) => write!(f, "{n}"),
-            RegAddress(r) => write!(f, "[r{r}]"),
+            RegAdress(r) => write!(f, "[r{r}]"),
             Adress(n) => write!(f, "[{n}]"),
         }
     }
