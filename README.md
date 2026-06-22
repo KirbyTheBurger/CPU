@@ -1,3 +1,18 @@
+# Memory layout
+**Memory map:**
+|    Region    | Purpose |
+|--------------|---------|
+|0x0000-0x3FFF |Program code|
+|0x4000-0x7FFF |Static memory|
+|0x8000-0xFFFF |Stack    |
+
+**Registers:**
+| Register | Internal id | Purpose |
+|----------|-------------|---------|
+|r0-r7     |0x00-0x07    |General purpose registers|
+|pc        |0x08         |Program counter|
+|sp        |0x09         |Stack pointer|
+
 # Instructions  
 **Operands:**  
 | Operand | Meaning |

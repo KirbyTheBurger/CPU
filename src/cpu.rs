@@ -1,6 +1,6 @@
 pub struct CPU {
     pub reg: [u16; 8],
-    pub mem: [u8; 0xFFFF],
+    pub mem: [u8; 0x10000],
     pub pc: u16,
     pub running: bool,
 }
@@ -9,7 +9,7 @@ impl CPU {
     pub fn new() -> CPU {
         CPU {
             reg: [0; 8],
-            mem: [0; 0xFFFF],
+            mem: [0; _],
             pc: 0,
             running: false,
         }
