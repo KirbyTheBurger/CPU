@@ -48,3 +48,11 @@
 |SUB       |Subtract a value from another|
 |MUL       |Multiply a value by another|
 |DIV       |Divide a value by another|
+
+# Internals and project structure  
+The overall layout of this project is what you would expect:  
+```
+source code -> assembler -> encoder -> execution loop
+```  
+\n
+The assembler transforms source code into an `Instruction` enum, then passes this over to the encoder, which transforms instructions into bytecode. The encoder is small but complex, utilizing an efficient macro (see [instruction.rs]) to decrease repetitive code. The macro accepts any amount of arguments of the form of `<InstructionName> = <Opcode>`. It then constructs the `Instruction` enum used in the assembler, and implements methods for encoding. The encoder only has to loop through a `Vec<Instruction>` and call the `encode` method on each one. After the source is compiled into bytecode, it gets passed over to the main execution loop, which walks through the bytecode and interprets it.
