@@ -149,8 +149,136 @@ mod tests {
     }
 
     #[test]
+    fn and_register() {
+        // 12 & 10 = 8
+        let cpu = run("LD r0, 12 LD r1, 10 AND r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 8);
+    }
+
+    #[test]
+    fn and_immediate() {
+        let cpu = run("LD r0, 12 AND r0, 10 HLT");
+        assert_eq!(cpu.reg[0], 8);
+    }
+
+    #[test]
+    fn and_with_zero() {
+        let cpu = run("LD r0, 255 AND r0, 0 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
+
+    #[test]
+    fn or_register() {
+        // 12 | 10 = 14
+        let cpu = run("LD r0, 12 LD r1, 10 OR r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 14);
+    }
+
+    #[test]
+    fn or_immediate() {
+        let cpu = run("LD r0, 12 OR r0, 10 HLT");
+        assert_eq!(cpu.reg[0], 14);
+    }
+
+    #[test]
+    fn or_with_zero() {
+        let cpu = run("LD r0, 42 OR r0, 0 HLT");
+        assert_eq!(cpu.reg[0], 42);
+    }
+
+    #[test]
+    fn xor_register() {
+        // 12 ^ 10 = 6
+        let cpu = run("LD r0, 12 LD r1, 10 XOR r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 6);
+    }
+
+    #[test]
+    fn xor_immediate() {
+        let cpu = run("LD r0, 12 XOR r0, 10 HLT");
+        assert_eq!(cpu.reg[0], 6);
+    }
+
+    #[test]
+    fn xor_with_self() {
+        let cpu = run("LD r0, 77 LD r1, 77 XOR r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
+
+    #[test]
+    fn lsh_register() {
+        let cpu = run("LD r0, 1 LD r1, 4 LSH r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 16);
+    }
+
+    #[test]
+    fn lsh_immediate() {
+        let cpu = run("LD r0, 1 LSH r0, 4 HLT");
+        assert_eq!(cpu.reg[0], 16);
+    }
+
+    #[test]
+    fn lsh_by_zero() {
+        let cpu = run("LD r0, 42 LSH r0, 0 HLT");
+        assert_eq!(cpu.reg[0], 42);
+    }
+
+    #[test]
+    fn rsh_register() {
+        let cpu = run("LD r0, 16 LD r1, 4 RSH r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 1);
+    }
+
+    #[test]
+    fn rsh_immediate() {
+        let cpu = run("LD r0, 16 RSH r0, 4 HLT");
+        assert_eq!(cpu.reg[0], 1);
+    }
+
+    #[test]
+    fn rsh_by_zero() {
+        let cpu = run("LD r0, 42 RSH r0, 0 HLT");
+        assert_eq!(cpu.reg[0], 42);
+    }
+
+    #[test]
     fn not() {
-        let cpu = run("LD r0, 5 NOT r0");
-        assert_eq!(cpu.reg[0], !5);
+        let cpu = run("LD r0, 5 NOT r0 HLT");
+        assert_eq!(cpu.reg[0], !5u16);
+    }
+
+    #[test]
+    fn not_zero() {
+        let cpu = run("LD r0, 0 NOT r0 HLT");
+        assert_eq!(cpu.reg[0], !0u16);
+    }
+
+    #[test]
+    fn not_twice_is_identity() {
+        let cpu = run("LD r0, 12345 NOT r0 NOT r0 HLT");
+        assert_eq!(cpu.reg[0], 12345);
+    }
+
+    #[test]
+    fn combined_bitwise_chain() {
+        // 15 & 10 = 10
+        // 10 | 1  = 11
+        // 11 ^ 15 = 4
+        // 4 << 2  = 16
+        // 16 >> 1 = 8
+        let cpu = run("LD r0, 15 AND r0, 10 OR r0, 1 XOR r0, 15 LSH r0, 2 RSH r0, 1 HLT");
+        assert_eq!(cpu.reg[0], 8);
+    }
+
+    #[test]
+    fn ld_reg_address_different_registers() {
+        let cpu = run("LD r0, 88 LD r5, 32768 ST [r5], r0 LD r3, [r5] HLT");
+        assert_eq!(cpu.reg[3], 88);
+    }
+
+    #[test]
+    fn st_different_address() {
+        let cpu = run("LD r0, 12 LD r1, 40000 ST [r1], r0 LD r2, [40000] HLT");
+        assert_eq!(cpu.reg[2], 12);
     }
 }
