@@ -37,76 +37,81 @@ impl CPU {
     }
 
     fn run_instruction(&mut self) {
-        match self.current() {
-            0x00 => {
+        use crate::instruction::*;
+
+        let byte = self.current();
+        let op = byte >> 2;
+        let mode = byte & 0b11;
+
+        match op {
+            OP_HLT => {
                 self.running = false;
             }
-            0x01 => {
+            OP_LD => {
                 let rx = self.next_byte();
-                let n = self.next_u16();
-                self.set_reg(rx, n);
+
+                match mode {
+                    MODE_IMM => {
+                        let n = self.next_u16();
+                        self.set_reg(rx, n);
+                    },
+                    MODE_REG => {
+                        let n = self.next_reg();
+                        self.set_reg(rx, n);
+                    },
+                    MODE_MEM => {
+                        let a = self.next_u16();
+                        let n = self.get_addr(a);
+                        self.set_reg(rx, n);
+                    },
+                    MODE_IND => {
+                        let a = self.next_reg();
+                        let n = self.get_addr(a);
+                        self.set_reg(rx, n);
+                    },
+                    _ => unreachable!(),
+                }
             },
-            0x02 => {
-                let rx = self.next_byte();
+            OP_ST => {
+                let a = self.next_reg();
                 let n = self.next_reg();
-                self.set_reg(rx, n);
+                self.set_addr(a, n);
             },
-            0x03 => {
-                let rx = self.next_byte();
-                let n = self.next_reg_addr();
-                self.set_reg(rx, n);
-            },
-            0x04 => {
-                let rx = self.next_byte();
-                let a = self.next_u16();
-                let n = self.get_addr(a);
-                self.set_reg(rx, n);
-            },
-            0x05 => {
-                let rx = self.next_byte();
-                let ry = self.next_byte();
-                self.set_addr(rx, ry);
-            },
-            0x06 => {
-                let rx = self.next_byte();
-                let n1 = self.get_reg(rx);
-                let n2 = self.next_reg();
-                self.set_reg(rx, n1 + n2);
-            },
-            0x07 => {
-                let rx = self.next_byte();
-                let n1 = self.get_reg(rx);
-                let n2 = self.next_u16();
-                self.set_reg(rx, n1 + n2);
-            },
-            0x08 => {
-                let rx = self.next_byte();
-                let n1 = self.get_reg(rx);
-                let n2 = self.next_reg();
-                self.set_reg(rx, n1 - n2);
-            },
-            0x09 => {
-                let rx = self.next_byte();
-                let n1 = self.get_reg(rx);
-                let n2 = self.next_u16();
-                self.set_reg(rx, n1 - n2);
-            },
-            0x0A => {
-                let rx = self.next_byte();
-                let n1 = self.get_reg(rx);
-                let n2 = self.next_reg();
-                self.set_reg(rx, n1 * n2);
-            },
-            0x0B => {
-                let rx = self.next_byte();
-                let n1 = self.get_reg(rx);
-                let n2 = self.next_reg();
-                self.set_reg(rx, n1 / n2);
-            },
-            0x0C => {
+            OP_NOT => {
                 let rx = self.next_byte();
                 let n = self.get_reg(rx);
                 self.set_reg(rx, !n);
+            },
+            OP_MUL | OP_DIV => {
+                let rx = self.next_byte();
+                let n1 = self.get_reg(rx);
+                let n2 = self.next_reg();
+
+                self.set_reg(rx, match op {
+                    OP_MUL => n1 * n2,
+                    OP_DIV => n1 / n2,
+                    _ => unreachable!(),
+                });
+            },
+            OP_ADD | OP_SUB | OP_AND..=OP_RSH => {
+                let rx = self.next_byte();
+                let n1 = self.get_reg(rx);
+                let n2 = match mode {
+                    MODE_IMM => self.next_u16(),
+                    MODE_REG => self.next_reg(),
+                    _ => unreachable!(),
+                };
+
+                self.set_reg(rx, match op {
+                    OP_ADD => n1 + n2,
+                    OP_SUB => n1 - n2,
+                    OP_AND => n1 & n2,
+                    OP_OR => n1 | n2,
+                    OP_XOR => n1 ^ n2,
+                    OP_LSH => n1 << n2,
+                    OP_RSH => n1 >> n2,
+                    _ => unreachable!(),
+                });
             },
             _ => todo!(),
         }
@@ -119,9 +124,7 @@ impl CPU {
         self.get_reg(r)
     }
 
-    fn set_addr(&mut self, rx: u8, ry: u8) {
-        let a = self.get_reg(rx);
-        let n = self.get_reg(ry);
+    fn set_addr(&mut self, a: u16, n: u16) {
         let b = n.to_be_bytes();
 
         self.mem[a as usize] = b[0];
@@ -133,11 +136,6 @@ impl CPU {
         let b1 = self.mem[n.wrapping_add(1) as usize];
 
         u16::from_be_bytes([b0, b1])
-    }
-
-    fn next_reg_addr(&mut self) -> u16 {
-        let n = self.next_reg();
-        self.get_addr(n)
     }
 
     fn next_byte(&mut self) -> u8 {
