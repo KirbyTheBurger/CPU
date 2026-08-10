@@ -37,6 +37,17 @@
 |0x09    |SUB       |rx, n     |
 |0x0A    |MUL       |rx, ry    |
 |0x0B    |DIV       |rx, ry    |
+|0x0C    |NOT       |rx        |
+|0x0D    |AND       |rx, ry    |
+|0x0E    |AND       |rx, n     |
+|0x0F    |OR        |rx, ry    |
+|0x10    |OR        |rx, n     |
+|0x11    |XOR       |rx, ry    |
+|0x12    |XOR       |rx, n     |
+|0x13    |LSH       |rx, ry    |
+|0x14    |LSH       |rx, n     |
+|0x15    |RSH       |rx, ry    |
+|0x16    |RSH       |rx, n     |
 
 **Mnemonics:**  
 | Mnemonic | Meaning |
@@ -48,6 +59,12 @@
 |SUB       |Subtract a value from another|
 |MUL       |Multiply a value by another|
 |DIV       |Divide a value by another|
+|NOT       |Bitwise NOT|
+|AND       |Bitwise AND|
+|OR        |Bitwise OR|
+|XOR       |Bitwise XOR|
+|LSH       |Left shift|
+|RSH       |Right shift|
 
 # Internals and project structure  
 The overall layout of this project is what you would expect:  
