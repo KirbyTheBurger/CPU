@@ -1,5 +1,3 @@
-use paste::paste;
-
 trait Encode {
     fn encode(&self) -> Vec<u8>;
 }
@@ -22,7 +20,7 @@ macro_rules! instructions {
             $variant:ident $( ( $t0:ty $(, $t1:ty $(, $t2:ty)? )? ) )? = $opcode:expr
         ),* $(,)?
     ) => {
-        paste! {
+        paste::paste! {
             #[derive(Debug, Clone, Copy)]
             pub enum Instruction {
                 $( $variant $( ( $t0 $(, $t1 $(, $t2)? )? ) )? ),*
@@ -65,22 +63,53 @@ macro_rules! instructions {
     };
 }
 
+pub const OP_HLT: u8 = 0;
+pub const OP_LD:  u8 = 1;
+pub const OP_ST:  u8 = 2;
+pub const OP_ADD: u8 = 3;
+pub const OP_SUB: u8 = 4;
+pub const OP_MUL: u8 = 5;
+pub const OP_DIV: u8 = 6;
+pub const OP_NOT: u8 = 7;
+pub const OP_AND: u8 = 8;
+pub const OP_OR:  u8 = 9;
+pub const OP_XOR: u8 = 10;
+pub const OP_LSH: u8 = 11;
+pub const OP_RSH: u8 = 12;
+
+pub const MODE_REG:  u8 = 0b00;
+pub const MODE_IMM:  u8 = 0b01;
+pub const MODE_IND:  u8 = 0b10;
+pub const MODE_MEM:  u8 = 0b11;
+pub const MODE_NONE: u8 = 0b00;
+
 instructions!(
-    HLT = 0x00,
+    HLT = (OP_HLT << 2) | MODE_NONE,
 
-    LDrn(u8, u16) = 0x01,
-    LDrr(u8, u8) = 0x02,
-    LDrar(u8, u8) = 0x03,
-    LDran(u8, u16) = 0x04,
+    LDrr(u8, u8)   = (OP_LD << 2) | MODE_REG,
+    LDrn(u8, u16)  = (OP_LD << 2) | MODE_IMM,
+    LDrar(u8, u8)  = (OP_LD << 2) | MODE_IND,
+    LDran(u8, u16) = (OP_LD << 2) | MODE_MEM,
 
-    ST(u8, u8) = 0x05,
+    ST(u8, u8) = (OP_ST << 2) | MODE_NONE,
 
-    ADDrr(u8, u8) = 0x06,
-    ADDrn(u8, u16) = 0x07,
-    SUBrr(u8, u8) = 0x08,
-    SUBrn(u8, u16) = 0x09,
-    MUL(u8, u8) = 0x0A,
-    DIV(u8, u8) = 0x0B,
+    ADDrr(u8, u8)  = (OP_ADD << 2) | MODE_REG,
+    ADDrn(u8, u16) = (OP_ADD << 2) | MODE_IMM,
+    SUBrr(u8, u8)  = (OP_SUB << 2) | MODE_REG,
+    SUBrn(u8, u16) = (OP_SUB << 2) | MODE_IMM,
+    MUL(u8, u8)    = (OP_MUL << 2) | MODE_REG,
+    DIV(u8, u8)    = (OP_DIV << 2) | MODE_REG,
 
-    NOT(u8) = 0x0C,
+    NOT(u8) = (OP_NOT << 2) | MODE_NONE,
+
+    ANDrr(u8, u8)  = (OP_AND << 2) | MODE_REG,
+    ANDrn(u8, u16) = (OP_AND << 2) | MODE_IMM,
+    ORrr(u8, u8)   = (OP_OR << 2) | MODE_REG,
+    ORrn(u8, u16)  = (OP_OR << 2) | MODE_IMM,
+    XORrr(u8, u8)  = (OP_XOR << 2) | MODE_REG,
+    XORrn(u8, u16) = (OP_XOR << 2) | MODE_IMM,
+    LSHrr(u8, u8)  = (OP_LSH << 2) | MODE_REG,
+    LSHrn(u8, u16) = (OP_LSH << 2) | MODE_IMM,
+    RSHrr(u8, u8)  = (OP_RSH << 2) | MODE_REG,
+    RSHrn(u8, u16) = (OP_RSH << 2) | MODE_IMM,
 );

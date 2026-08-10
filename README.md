@@ -23,31 +23,31 @@
 |[n]      |Value at memory adress n|
 
 **Instructions:**  
-| Opcode | Mnemonic | Operands |
-|--------|----------|----------|
-|0x00    |HLT       |          |
-|0x01    |LD        |rx, n     |
-|0x02    |LD        |rx, ry    |
-|0x03    |LD        |rx, [ry]  |
-|0x04    |LD        |rx, [n]   |
-|0x05    |ST        |[rx], ry  |
-|0x06    |ADD       |rx, ry    |
-|0x07    |ADD       |rx, n     |
-|0x08    |SUB       |rx, ry    |
-|0x09    |SUB       |rx, n     |
-|0x0A    |MUL       |rx, ry    |
-|0x0B    |DIV       |rx, ry    |
-|0x0C    |NOT       |rx        |
-|0x0D    |AND       |rx, ry    |
-|0x0E    |AND       |rx, n     |
-|0x0F    |OR        |rx, ry    |
-|0x10    |OR        |rx, n     |
-|0x11    |XOR       |rx, ry    |
-|0x12    |XOR       |rx, n     |
-|0x13    |LSH       |rx, ry    |
-|0x14    |LSH       |rx, n     |
-|0x15    |RSH       |rx, ry    |
-|0x16    |RSH       |rx, n     |
+| Opcode | Mnemonic | Operands  |
+|--------|----------|-----------|
+| 0x00   | HLT      |           |
+| 0x04   | LD       | rx, ry    |
+| 0x05   | LD       | rx, n     |
+| 0x06   | LD       | rx, [ry]  |
+| 0x07   | LD       | rx, [n]   |
+| 0x08   | ST       | [rx], ry  |
+| 0x0C   | ADD      | rx, ry    |
+| 0x0D   | ADD      | rx, n     |
+| 0x10   | SUB      | rx, ry    |
+| 0x11   | SUB      | rx, n     |
+| 0x14   | MUL      | rx, ry    |
+| 0x18   | DIV      | rx, ry    |
+| 0x1C   | NOT      | rx        |
+| 0x20   | AND      | rx, ry    |
+| 0x21   | AND      | rx, n     |
+| 0x24   | OR       | rx, ry    |
+| 0x25   | OR       | rx, n     |
+| 0x28   | XOR      | rx, ry    |
+| 0x29   | XOR      | rx, n     |
+| 0x2C   | LSH      | rx, ry    |
+| 0x2D   | LSH      | rx, n     |
+| 0x30   | RSH      | rx, ry    |
+| 0x31   | RSH      | rx, n     |
 
 **Mnemonics:**  
 | Mnemonic | Meaning |
