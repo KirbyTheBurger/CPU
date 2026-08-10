@@ -103,6 +103,11 @@ impl CPU {
                 let n2 = self.next_reg();
                 self.set_reg(rx, n1 / n2);
             },
+            0x0C => {
+                let rx = self.next_byte();
+                let n = self.get_reg(rx);
+                self.set_reg(rx, !n);
+            },
             _ => todo!(),
         }
 

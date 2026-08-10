@@ -139,6 +139,10 @@ impl Assembler {
                     _ => unreachable!()
                 }
             },
+            "NOT" => {
+                let rx = ensure!(args!(self, 1)[0], reg);
+                instr(NOT(rx))
+            },
             _ => todo!()
         }
     }

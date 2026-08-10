@@ -147,4 +147,10 @@ mod tests {
         let cpu = run("LD r0, 10 LD r1, 5 ADD r0, r1 LD r1, 2 MUL r0, r1 LD r1, 3 SUB r0, r1 HLT");
         assert_eq!(cpu.reg[0], 27);
     }
+
+    #[test]
+    fn not() {
+        let cpu = run("LD r0, 5 NOT r0");
+        assert_eq!(cpu.reg[0], !5);
+    }
 }

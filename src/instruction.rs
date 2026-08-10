@@ -81,4 +81,6 @@ instructions!(
     SUBrn(u8, u16) = 0x09,
     MUL(u8, u8) = 0x0A,
     DIV(u8, u8) = 0x0B,
+
+    NOT(u8) = 0x0C,
 );
