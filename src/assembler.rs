@@ -143,6 +143,30 @@ impl Assembler {
                 let rx = ensure!(args!(self, 1)[0], reg);
                 instr(NOT(rx))
             },
+            "AND" | "OR" | "XOR" | "LSH" | "RSH" => {
+                let args = args!(self, 2);
+                let rx = ensure!(args[0], reg);
+
+                match args[1] {
+                    Register(ry) => match word {
+                        "AND" => instr(ANDrr(rx, ry)),
+                        "OR" => instr(ORrr(rx, ry)),
+                        "XOR" => instr(XORrr(rx, ry)),
+                        "LSH" => instr(LSHrr(rx, ry)),
+                        "RSH" => instr(RSHrr(rx, ry)),
+                        _ => unreachable!(),
+                    },
+                    Number(n) => match word {
+                        "AND" => instr(ANDrn(rx, n)),
+                        "OR" => instr(ORrn(rx, n)),
+                        "XOR" => instr(XORrn(rx, n)),
+                        "LSH" => instr(LSHrn(rx, n)),
+                        "RSH" => instr(RSHrn(rx, n)),
+                        _ => unreachable!(),
+                    },
+                    _ => throw(InvalidArg),
+                }
+            },
             _ => todo!()
         }
     }
