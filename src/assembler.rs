@@ -108,26 +108,6 @@ impl Assembler {
 
                 instr(ST(rx, ry))
             },
-            "ADD" => {
-                let args = args!(self, 2);
-                let rx = ensure!(args[0], reg);
-
-                match args[1] {
-                    Register(ry) => instr(ADDrr(rx, ry)),
-                    Number(n) => instr(ADDrn(rx, n)),
-                    _ => throw(InvalidArg),
-                }
-            },
-            "SUB" => {
-                let args = args!(self, 2);
-                let rx = ensure!(args[0], reg);
-
-                match args[1] {
-                    Register(ry) => instr(SUBrr(rx, ry)),
-                    Number(n) => instr(SUBrn(rx, n)),
-                    _ => throw(InvalidArg),
-                }
-            },
             "MUL" | "DIV" => {
                 let args = args!(self, 2);
                 let rx = ensure!(args[0], reg);
@@ -143,7 +123,7 @@ impl Assembler {
                 let rx = ensure!(args!(self, 1)[0], reg);
                 instr(NOT(rx))
             },
-            "AND" | "OR" | "XOR" | "LSH" | "RSH" => {
+            "AND" | "OR" | "XOR" | "LSH" | "RSH" | "SUB" | "ADD" => {
                 let args = args!(self, 2);
                 let rx = ensure!(args[0], reg);
 
@@ -154,6 +134,8 @@ impl Assembler {
                         "XOR" => instr(XORrr(rx, ry)),
                         "LSH" => instr(LSHrr(rx, ry)),
                         "RSH" => instr(RSHrr(rx, ry)),
+                        "ADD" => instr(ADDrr(rx, ry)),
+                        "SUB" => instr(SUBrr(rx, ry)),
                         _ => unreachable!(),
                     },
                     Number(n) => match word {
@@ -162,6 +144,8 @@ impl Assembler {
                         "XOR" => instr(XORrn(rx, n)),
                         "LSH" => instr(LSHrn(rx, n)),
                         "RSH" => instr(RSHrn(rx, n)),
+                        "ADD" => instr(ADDrn(rx, n)),
+                        "SUB" => instr(SUBrn(rx, n)),
                         _ => unreachable!(),
                     },
                     _ => throw(InvalidArg),
