@@ -12,6 +12,11 @@ pub enum Operand {
     Adress(u16),
 }
 
+pub enum Item {
+    Instruction(Instruction),
+    Label(String),
+}
+
 pub struct Assembler {
     input: Vec<char>,
     pos: usize,
@@ -27,7 +32,7 @@ macro_rules! args {
 }
 
 /**
-    Macro for ensuring a argument is valid, will throw the appropiate error if not.
+    Macro for ensuring an argument is valid, will throw the appropiate error if not.
     Possible inputs:
     - reg: throws `ExpectedReg`
     - num: throws `ExpectedNum`
@@ -64,7 +69,7 @@ impl Assembler {
         }
     }
 
-    pub fn process(&mut self) -> Result<Vec<Instruction>, Error> {
+    pub fn process(&mut self) -> Result<Vec<Item>, Error> {
         let mut instr = vec![];
 
         self.skip_whitespace();
@@ -82,9 +87,15 @@ impl Assembler {
         Ok(instr)
     }
 
-    fn process_instruction(&mut self) -> Option<Result<Instruction, Error>> {
+    fn process_instruction(&mut self) -> Option<Result<Item, Error>> {
         let word = self.read_word()?;
         let word = word.as_str();
+
+        if word.ends_with(':') && word.len() > 1 {
+            return Some(Ok(Item::Label(
+                word[..word.len() - 1].to_string()
+            )));
+        }
 
         match word {
             "LD" => {
@@ -283,12 +294,12 @@ impl Assembler {
     }
 }
 
-fn throw(err: Error) -> Option<Result<Instruction, Error>> {
+fn throw(err: Error) -> Option<Result<Item, Error>> {
     Some(Err(err))
 }
 
-fn instr(i: Instruction) -> Option<Result<Instruction, Error>> {
-    Some(Ok(i))
+fn instr(i: Instruction) -> Option<Result<Item, Error>> {
+    Some(Ok(Item::Instruction(i)))
 }
 
 impl Display for Operand {
