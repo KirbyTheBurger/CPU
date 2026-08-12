@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{assembler::{Item, JumpKind}, instruction::Instruction};
+use crate::{assembler::{Item, JumpKind}, cpu::{CODE_END, CODE_START}, instruction::Instruction};
 
 pub fn encode(items: Vec<Item>) -> Result<Vec<u8>, String> {
     let mut labels: HashMap<String, u16> = HashMap::new();
@@ -42,6 +42,13 @@ pub fn encode(items: Vec<Item>) -> Result<Vec<u8>, String> {
                 }.encode());
             },
         }
+    }
+
+    if bytes.len() > CODE_END as usize {
+        return Err(format!(
+            "Program size out of bounds; Reserved size for code: {:#X}-{:#X}, program size: {} bytes",
+            CODE_START, CODE_END, bytes.len()
+        ));
     }
 
     Ok(bytes)
