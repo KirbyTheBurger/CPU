@@ -132,7 +132,7 @@ impl Assembler {
                     Number(n) => instr(LDrn(rx, n)),
                     RegAdress(ry) => instr(LDrar(rx, ry)),
                     Adress(n) => instr(LDran(rx, n)),
-                    _ => unreachable!(),
+                    _ => Some(Err(Error::InvalidArg)),
                 }
             },
             "HLT" => {
@@ -209,6 +209,14 @@ impl Assembler {
                     kind,
                     label: l,
                 }))
+            },
+            "OUT" => {
+                let args = args!(self, 1);
+                match args[0] {
+                    Register(rx) => instr(OUTr(rx)),
+                    Number(n) => instr(OUTn(n)),
+                    _ => Some(Err(Error::InvalidArg)),
+                }
             },
             _ => todo!()
         }

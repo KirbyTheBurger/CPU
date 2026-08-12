@@ -193,6 +193,18 @@ impl CPU {
                     return Ok(());
                 }
             },
+            OP_OUT => {
+                let n = match mode {
+                    MODE_REG => self.next_reg(),
+                    MODE_IMM => self.next_u16(),
+                    _ => unreachable!(),
+                };
+                let ch = match char::from_u32(n as u32) {
+                    Some(c) => c,
+                    None => return Err(format!("{:#X} is not valid ASCII", n))
+                };
+                print!("{ch}");
+            }
             _ => todo!(),
         }
 
