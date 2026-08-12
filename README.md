@@ -21,6 +21,7 @@
 |n        |Number   |
 |[rx]     |Value at memory adress stored in rx|
 |[n]      |Value at memory adress n|
+|l        |Label    |
 
 **Instructions:**  
 | Opcode | Mnemonic | Operands  |
@@ -48,6 +49,7 @@
 | 0x2D   | LSH      | rx, n     |
 | 0x30   | RSH      | rx, ry    |
 | 0x31   | RSH      | rx, n     |
+| 0x34   | JMP      | l         |
 
 **Mnemonics:**  
 | Mnemonic | Meaning |
