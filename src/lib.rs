@@ -649,4 +649,100 @@ mod tests {
         code.push_str("HLT");
         run(&code);
     }
+
+    #[test]
+    fn call_ret_basic() {
+        let cpu = run("CALL func LD r0, 1 HLT func: LD r0, 2 RET");
+        assert_eq!(cpu.reg[0], 1);
+    }
+
+    #[test]
+    fn call_executes_function_body() {
+        let cpu = run("CALL func HLT func: LD r1, 99 RET");
+        assert_eq!(cpu.reg[1], 99);
+    }
+
+    #[test]
+    fn call_returns_to_correct_address() {
+        let cpu = run("CALL func LD r0, 1 LD r1, 2 HLT func: LD r2, 3 RET");
+        assert_eq!(cpu.reg[0], 1);
+        assert_eq!(cpu.reg[1], 2);
+        assert_eq!(cpu.reg[2], 3);
+    }
+
+    #[test]
+    fn call_does_not_fall_through_after_ret() {
+        let cpu = run("CALL func LD r0, 1 HLT func: LD r0, 2 RET");
+        assert_eq!(cpu.reg[0], 1);
+    }
+
+    #[test]
+    fn multiple_calls_same_function() {
+        let cpu = run("
+            CALL inc
+            CALL inc
+            CALL inc
+            HLT
+            inc: ADD r0, 1 RET
+        ");
+        assert_eq!(cpu.reg[0], 3);
+    }
+
+    #[test]
+    fn nested_calls() {
+        let cpu = run("
+            CALL outer
+            HLT
+            outer: CALL inner LD r1, 10 RET
+            inner: LD r0, 5 RET
+        ");
+        assert_eq!(cpu.reg[0], 5);
+        assert_eq!(cpu.reg[1], 10);
+    }
+
+    #[test]
+    fn call_preserves_stack_pointer_after_return() {
+        let mut cpu = CPU::new();
+        let before = cpu.sp;
+        cpu.load(vec![]);
+        let cpu2 = run("CALL func HLT func: RET");
+        assert_eq!(cpu2.sp, before);
+    }
+
+    #[test]
+    fn call_with_push_pop_inside_function() {
+        let cpu = run("
+            LD r0, 5
+            CALL func
+            HLT
+            func: PUSH r0 LD r0, 99 POP r1 RET
+        ");
+        assert_eq!(cpu.reg[1], 5);
+    }
+
+    #[test]
+    #[should_panic]
+    fn ret_without_call_errors() {
+        run("RET HLT");
+    }
+
+    #[test]
+    #[should_panic]
+    fn ret_with_empty_stack_errors() {
+        run("RET HLT");
+    }
+
+    #[test]
+    fn call_in_loop_with_conditional() {
+        let cpu = run("
+            LD r0, 0
+            LD r1, 3
+            loop: CALL inc
+            CMP r0, r1
+            JLT loop
+            HLT
+            inc: ADD r0, 1 RET
+        ");
+        assert_eq!(cpu.reg[0], 3);
+    }
 }
