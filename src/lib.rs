@@ -263,11 +263,6 @@ mod tests {
 
     #[test]
     fn combined_bitwise_chain() {
-        // 15 & 10 = 10
-        // 10 | 1  = 11
-        // 11 ^ 15 = 4
-        // 4 << 2  = 16
-        // 16 >> 1 = 8
         let cpu = run("LD r0, 15 AND r0, 10 OR r0, 1 XOR r0, 15 LSH r0, 2 RSH r0, 1 HLT");
         assert_eq!(cpu.reg[0], 8);
     }
@@ -370,5 +365,115 @@ mod tests {
         let cpu = run("LD r0, 10 LD r1, 3 CMP r0, r1 HLT");
         assert_eq!(cpu.reg[0], 10);
         assert_eq!(cpu.reg[1], 3);
+    }
+
+    #[test]
+    fn jeq_taken_when_equal() {
+        let cpu = run("LD r0, 5 LD r1, 5 CMP r0, r1 JEQ target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 0);
+    }
+
+    #[test]
+    fn jeq_not_taken_when_not_equal() {
+        let cpu = run("LD r0, 5 LD r1, 3 CMP r0, r1 JEQ target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 99);
+    }
+
+    #[test]
+    fn jne_taken_when_not_equal() {
+        let cpu = run("LD r0, 5 LD r1, 3 CMP r0, r1 JNE target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 0);
+    }
+
+    #[test]
+    fn jne_not_taken_when_equal() {
+        let cpu = run("LD r0, 5 LD r1, 5 CMP r0, r1 JNE target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 99);
+    }
+
+    #[test]
+    fn jlt_taken_when_less() {
+        let cpu = run("LD r0, 3 LD r1, 10 CMP r0, r1 JLT target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 0);
+    }
+
+    #[test]
+    fn jlt_not_taken_when_equal() {
+        let cpu = run("LD r0, 5 LD r1, 5 CMP r0, r1 JLT target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 99);
+    }
+
+    #[test]
+    fn jlt_not_taken_when_greater() {
+        let cpu = run("LD r0, 10 LD r1, 3 CMP r0, r1 JLT target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 99);
+    }
+
+    #[test]
+    fn jge_taken_when_greater() {
+        let cpu = run("LD r0, 10 LD r1, 3 CMP r0, r1 JGE target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 0);
+    }
+
+    #[test]
+    fn jge_taken_when_equal() {
+        let cpu = run("LD r0, 5 LD r1, 5 CMP r0, r1 JGE target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 0);
+    }
+
+    #[test]
+    fn jge_not_taken_when_less() {
+        let cpu = run("LD r0, 3 LD r1, 10 CMP r0, r1 JGE target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 99);
+    }
+
+    #[test]
+    fn jgt_taken_when_greater() {
+        let cpu = run("LD r0, 10 LD r1, 3 CMP r0, r1 JGT target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 0);
+    }
+
+    #[test]
+    fn jgt_not_taken_when_equal() {
+        let cpu = run("LD r0, 5 LD r1, 5 CMP r0, r1 JGT target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 99);
+    }
+
+    #[test]
+    fn jgt_not_taken_when_less() {
+        let cpu = run("LD r0, 3 LD r1, 10 CMP r0, r1 JGT target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 99);
+    }
+
+    #[test]
+    fn jle_taken_when_less() {
+        let cpu = run("LD r0, 3 LD r1, 10 CMP r0, r1 JLE target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 0);
+    }
+
+    #[test]
+    fn jle_taken_when_equal() {
+        let cpu = run("LD r0, 5 LD r1, 5 CMP r0, r1 JLE target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 0);
+    }
+
+    #[test]
+    fn jle_not_taken_when_greater() {
+        let cpu = run("LD r0, 10 LD r1, 3 CMP r0, r1 JLE target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 99);
+    }
+
+    #[test]
+    fn countdown_loop_with_jlt() {
+        let cpu = run("
+            LD r0, 0
+            LD r1, 1
+            LD r2, 5
+            loop: ADD r0, r1
+            CMP r0, r2
+            JLT loop
+            HLT
+        ");
+        assert_eq!(cpu.reg[0], 5);
     }
 }
