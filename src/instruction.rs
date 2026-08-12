@@ -77,6 +77,7 @@ pub const OP_XOR: u8 = 10;
 pub const OP_LSH: u8 = 11;
 pub const OP_RSH: u8 = 12;
 pub const OP_JMP: u8 = 13;
+pub const OP_CMP: u8 = 14;
 
 pub const MODE_REG:  u8 = 0b00;
 pub const MODE_IMM:  u8 = 0b01;
@@ -115,4 +116,7 @@ instructions!(
     RSHrn(u8, u16) = (OP_RSH << 2) | MODE_IMM,
 
     JMP(u16) = (OP_JMP << 2) | MODE_NONE,
+
+    CMPrr(u8, u8) = (OP_CMP << 2) | MODE_REG,
+    CMPrn(u8, u16) = (OP_CMP << 2) | MODE_IMM,
 );
