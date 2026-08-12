@@ -9,6 +9,7 @@ pub enum Error {
     ExpectedReg,
     ExpectedRegAddr,
     ExpectedNum,
+    ExpectedLabel,
 
     InvalidReg(char),
     MissingRegIndex,
@@ -36,6 +37,7 @@ impl Display for Error {
             NumAboveCap(n) => write!(f, "Number `{n}` is greater than 65535"),
             ExpectedNum => write!(f, "Invalid argument, expected a number"),
             ExpectedRegAddr => write!(f, "Invalid argument, expected a register containing a memory adress"),
+            ExpectedLabel => write!(f, "Invalid argument, expected a label"),
         }
     }
 }
