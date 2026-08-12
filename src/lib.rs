@@ -283,4 +283,23 @@ mod tests {
         let cpu = run("LD r0, 12 LD r1, 40000 ST [r1], r0 LD r2, [40000] HLT");
         assert_eq!(cpu.reg[2], 12);
     }
+
+    #[test]
+    fn jmp_basic_forward() {
+        let cpu = run("JMP skip LD r0, 99 skip: LD r0, 1 HLT");
+        assert_eq!(cpu.reg[0], 1);
+    }
+
+    #[test]
+    fn jmp_skips_intermediate_instructions() {
+        let cpu = run("LD r0, 1 JMP target LD r0, 2 LD r0, 3 target: LD r1, 42 HLT");
+        assert_eq!(cpu.reg[0], 1);
+        assert_eq!(cpu.reg[1], 42);
+    }
+
+    #[test]
+    fn jmp_to_label_at_start() {
+        let cpu = run("start: LD r0, 7 HLT");
+        assert_eq!(cpu.reg[0], 7);
+    }
 }
