@@ -116,6 +116,7 @@ impl CPU {
             OP_JMP => {
                 let a = self.next_u16();
                 self.pc = a;
+                return;
             },
             _ => todo!(),
         }
