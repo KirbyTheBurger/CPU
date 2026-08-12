@@ -26,7 +26,7 @@ fn main() {
 
     let mut cpu = CPU::new();
     cpu.load(program);
-    cpu.run(false);
+    cpu.run(true);
     println!("{:?}", cpu.reg);
 }
 

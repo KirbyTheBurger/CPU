@@ -146,7 +146,7 @@ impl Assembler {
                 let rx = ensure!(args!(self, 1)[0], reg);
                 instr(NOT(rx))
             },
-            "AND" | "OR" | "XOR" | "LSH" | "RSH" | "SUB" | "ADD" => {
+            "AND" | "OR" | "XOR" | "LSH" | "RSH" | "SUB" | "ADD" | "CMP" => {
                 let args = args!(self, 2);
                 let rx = ensure!(args[0], reg);
 
@@ -159,6 +159,7 @@ impl Assembler {
                         "RSH" => instr(RSHrr(rx, ry)),
                         "ADD" => instr(ADDrr(rx, ry)),
                         "SUB" => instr(SUBrr(rx, ry)),
+                        "CMP" => instr(CMPrr(rx, ry)),
                         _ => unreachable!(),
                     },
                     Number(n) => match word {
@@ -169,6 +170,7 @@ impl Assembler {
                         "RSH" => instr(RSHrn(rx, n)),
                         "ADD" => instr(ADDrn(rx, n)),
                         "SUB" => instr(SUBrn(rx, n)),
+                        "CMP" => instr(CMPrn(rx, n)),
                         _ => unreachable!(),
                     },
                     _ => throw(InvalidArg),

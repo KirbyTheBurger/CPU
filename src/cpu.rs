@@ -1,8 +1,12 @@
+const FLAG_ZERO: u8 = 0b0000_0001;
+const FLAG_LT: u8 = 0b0000_0010;
+
 pub struct CPU {
     pub reg: [u16; 8],
     pub mem: [u8; 0x10000],
     pub pc: u16,
     pub running: bool,
+    pub flags: u8,
 }
 
 impl CPU {
@@ -12,6 +16,7 @@ impl CPU {
             mem: [0; _],
             pc: 0,
             running: false,
+            flags: 0,
         }
     }
 
@@ -31,7 +36,10 @@ impl CPU {
             self.run_instruction();
 
             if debug {
-                println!("registers: {:?}\npc: {}\nrunning: {}", self.reg, self.pc, self.running);
+                println!(
+                    "registers: {:?}\npc: {}\nrunning: {}\nflags: {:08b}",
+                    self.reg, self.pc, self.running, self.flags,
+                );
             }
         }
     }
@@ -112,6 +120,23 @@ impl CPU {
                     OP_RSH => n1 >> n2,
                     _ => unreachable!(),
                 });
+            },
+            OP_CMP => {
+                let rx = self.next_byte();
+                let n1 = self.get_reg(rx);
+                let n2 = match mode {
+                    MODE_REG => {
+                        self.next_reg()
+                    },
+                    MODE_IMM => {
+                        self.next_u16()
+                    },
+                    _ => unreachable!(),
+                };
+
+                self.flags = 0;
+                if n1 == n2 { self.flags |= FLAG_ZERO };
+                if n1 < n2 { self.flags |= FLAG_LT };
             },
             OP_JMP => {
                 let a = self.next_u16();

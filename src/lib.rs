@@ -302,4 +302,73 @@ mod tests {
         let cpu = run("start: LD r0, 7 HLT");
         assert_eq!(cpu.reg[0], 7);
     }
+
+    #[test]
+    fn cmp_equal_sets_zero_flag() {
+        let cpu = run("LD r0, 5 LD r1, 5 CMP r0, r1 HLT");
+        assert_eq!(cpu.flags & 0b1, 0b1);
+        assert_eq!(cpu.flags & 0b10, 0);
+    }
+
+    #[test]
+    fn cmp_less_than_sets_lt_flag() {
+        let cpu = run("LD r0, 3 LD r1, 10 CMP r0, r1 HLT");
+        assert_eq!(cpu.flags & 0b10, 0b10);
+        assert_eq!(cpu.flags & 0b1, 0);
+    }
+
+    #[test]
+    fn cmp_greater_than_clears_both_flags() {
+        let cpu = run("LD r0, 10 LD r1, 3 CMP r0, r1 HLT");
+        assert_eq!(cpu.flags & 0b1, 0);
+        assert_eq!(cpu.flags & 0b10, 0);
+    }
+
+    #[test]
+    fn cmp_immediate_equal() {
+        let cpu = run("LD r0, 7 CMP r0, 7 HLT");
+        assert_eq!(cpu.flags & 0b1, 0b1);
+        assert_eq!(cpu.flags & 0b10, 0);
+    }
+
+    #[test]
+    fn cmp_immediate_less_than() {
+        let cpu = run("LD r0, 2 CMP r0, 9 HLT");
+        assert_eq!(cpu.flags & 0b10, 0b10);
+        assert_eq!(cpu.flags & 0b1, 0);
+    }
+
+    #[test]
+    fn cmp_immediate_greater_than() {
+        let cpu = run("LD r0, 9 CMP r0, 2 HLT");
+        assert_eq!(cpu.flags & 0b1, 0);
+        assert_eq!(cpu.flags & 0b10, 0);
+    }
+
+    #[test]
+    fn cmp_with_zero() {
+        let cpu = run("LD r0, 0 LD r1, 0 CMP r0, r1 HLT");
+        assert_eq!(cpu.flags & 0b1, 0b1);
+        assert_eq!(cpu.flags & 0b10, 0);
+    }
+
+    #[test]
+    fn cmp_zero_less_than_nonzero() {
+        let cpu = run("LD r0, 0 LD r1, 1 CMP r0, r1 HLT");
+        assert_eq!(cpu.flags & 0b10, 0b10);
+    }
+
+    #[test]
+    fn cmp_overwrites_previous_flags() {
+        let cpu = run("LD r0, 1 LD r1, 5 CMP r0, r1 LD r2, 5 CMP r2, r1 HLT");
+        assert_eq!(cpu.flags & 0b1, 0b1);
+        assert_eq!(cpu.flags & 0b10, 0);
+    }
+
+    #[test]
+    fn cmp_does_not_modify_registers() {
+        let cpu = run("LD r0, 10 LD r1, 3 CMP r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 10);
+        assert_eq!(cpu.reg[1], 3);
+    }
 }
