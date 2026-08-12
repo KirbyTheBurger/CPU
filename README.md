@@ -58,6 +58,9 @@
 | 0x48   | JLE      | l         |
 | 0x4C   | JGT      | l         |
 | 0x50   | JGE      | l         |
+| 0x54   | OUT      | rx        |
+| 0x55   | OUT      | n         |
+| 0x58   | IN       | rx        |
 
 **Mnemonics:**  
 | Mnemonic | Meaning |
@@ -83,3 +86,5 @@
 |JLE       |Jump if less than or equal|
 |JGT       |Jump if greater than|
 |JGE       |Jump if greater than or equal|
+|OUT       |Output a single character|
+|IN        |Wait for a single character input|

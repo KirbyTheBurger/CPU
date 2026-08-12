@@ -84,6 +84,8 @@ pub const OP_JLT: u8 = 17;
 pub const OP_JLE: u8 = 18;
 pub const OP_JGT: u8 = 19;
 pub const OP_JGE: u8 = 20;
+pub const OP_OUT: u8 = 21;
+pub const OP_IN:  u8 = 22;
 
 pub const MODE_REG:  u8 = 0b00;
 pub const MODE_IMM:  u8 = 0b01;
@@ -132,4 +134,8 @@ instructions!(
     JLE(u16) = (OP_JLE << 2) | MODE_NONE,
     JGT(u16) = (OP_JGT << 2) | MODE_NONE,
     JGE(u16) = (OP_JGE << 2) | MODE_NONE,
+
+    OUTr(u8) = (OP_OUT << 2) | MODE_REG,
+    OUTn(u16) = (OP_OUT << 2) | MODE_IMM,
+    IN(u8) = (OP_IN << 2) | MODE_NONE,
 );
