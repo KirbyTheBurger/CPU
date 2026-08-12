@@ -13,11 +13,25 @@ pub enum Operand {
     Label(String),
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum JumpKind {
+    JMP,
+    JEQ,
+    JNE,
+    JLT,
+    JLE,
+    JGT,
+    JGE,
+}
+
 #[derive(Debug)]
 pub enum Item {
     Instruction(Instruction),
     Label(String),
-    UnresolvedJump(String),
+    UnresolvedJump {
+        kind: JumpKind,
+        label: String,
+    },
 }
 
 pub struct Assembler {
@@ -176,10 +190,25 @@ impl Assembler {
                     _ => throw(InvalidArg),
                 }
             },
-            "JMP" => {
+            "JMP" | "JEQ" | "JNE" | "JLT" | "JLE" | "JGT" | "JGE" => {
                 let args = args!(self, 1);
                 let l = ensure!(args[0].clone(), label);
-                Some(Ok(Item::UnresolvedJump(l)))
+
+                let kind = match word {
+                    "JMP" => JumpKind::JMP,
+                    "JEQ" => JumpKind::JEQ,
+                    "JNE" => JumpKind::JNE,
+                    "JLT" => JumpKind::JLT,
+                    "JLE" => JumpKind::JLE,
+                    "JGT" => JumpKind::JGT,
+                    "JGE" => JumpKind::JGE,
+                    _ => unreachable!(),
+                };
+
+                Some(Ok(Item::UnresolvedJump {
+                    kind,
+                    label: l,
+                }))
             },
             _ => todo!()
         }
