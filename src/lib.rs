@@ -575,4 +575,78 @@ mod tests {
         let cpu = run("LD r0, 0x1 LSH r0, 0x4 HLT");
         assert_eq!(cpu.reg[0], 16);
     }
+
+    #[test]
+    fn push_pop_roundtrip() {
+        let cpu = run("PUSH 1234 POP r0 HLT");
+        assert_eq!(cpu.reg[0], 1234);
+    }
+
+    #[test]
+    fn push_pop_lifo_order() {
+        let cpu = run("PUSH 1 PUSH 2 PUSH 3 POP r0 POP r1 POP r2 HLT");
+        assert_eq!(cpu.reg[0], 3);
+        assert_eq!(cpu.reg[1], 2);
+        assert_eq!(cpu.reg[2], 1);
+    }
+
+    #[test]
+    fn push_zero() {
+        let cpu = run("PUSH 0 POP r0 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
+
+    #[test]
+    fn push_max_u16() {
+        let cpu = run("PUSH 65535 POP r0 HLT");
+        assert_eq!(cpu.reg[0], 65535);
+    }
+
+    #[test]
+    fn push_reg_variant() {
+        let cpu = run("LD r0, 42 PUSH r0 POP r1 HLT");
+        assert_eq!(cpu.reg[1], 42);
+    }
+
+    #[test]
+    fn push_imm_variant() {
+        let cpu = run("PUSH 99 POP r0 HLT");
+        assert_eq!(cpu.reg[0], 99);
+    }
+
+    #[test]
+    fn push_does_not_modify_source_register() {
+        let cpu = run("LD r0, 7 PUSH r0 POP r1 HLT");
+        assert_eq!(cpu.reg[0], 7);
+    }
+
+    #[test]
+    fn multiple_push_pop_sequence() {
+        let cpu = run("LD r0, 1 LD r1, 2 PUSH r0 PUSH r1 POP r2 POP r3 HLT");
+        assert_eq!(cpu.reg[2], 2);
+        assert_eq!(cpu.reg[3], 1);
+    }
+
+    #[test]
+    #[should_panic]
+    fn pop_empty_stack_errors() {
+        run("POP r0 HLT");
+    }
+
+    #[test]
+    #[should_panic]
+    fn pop_more_than_pushed_errors() {
+        run("PUSH 1 POP r0 POP r1 HLT");
+    }
+
+    #[test]
+    #[should_panic]
+    fn push_until_stack_overflow_errors() {
+        let mut code = String::new();
+        for _ in 0..1000 {
+            code.push_str("PUSH 1 ");
+        }
+        code.push_str("HLT");
+        run(&code);
+    }
 }
