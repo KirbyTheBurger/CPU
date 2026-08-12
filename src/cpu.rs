@@ -1,6 +1,13 @@
 const FLAG_ZERO: u8 = 0b0000_0001;
 const FLAG_LT: u8 = 0b0000_0010;
 
+const CODE_START: u16 = 0x0000;
+const CODE_END: u16   = 0x3FFF;
+const DATA_START: u16 = 0x4000;
+const DATA_END: u16   = 0xFBFF;
+const STACK_TOP: u16  = 0xFFFF;
+const STACK_LOW: u16  = 0xFC00;
+
 pub struct CPU {
     pub reg: [u16; 8],
     pub mem: [u8; 0x10000],
