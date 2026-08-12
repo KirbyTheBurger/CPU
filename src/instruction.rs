@@ -78,6 +78,12 @@ pub const OP_LSH: u8 = 11;
 pub const OP_RSH: u8 = 12;
 pub const OP_JMP: u8 = 13;
 pub const OP_CMP: u8 = 14;
+pub const OP_JEQ: u8 = 15;
+pub const OP_JNE: u8 = 16;
+pub const OP_JLT: u8 = 17;
+pub const OP_JLE: u8 = 18;
+pub const OP_JGT: u8 = 19;
+pub const OP_JGE: u8 = 20;
 
 pub const MODE_REG:  u8 = 0b00;
 pub const MODE_IMM:  u8 = 0b01;
@@ -119,4 +125,11 @@ instructions!(
 
     CMPrr(u8, u8) = (OP_CMP << 2) | MODE_REG,
     CMPrn(u8, u16) = (OP_CMP << 2) | MODE_IMM,
+
+    JEQ(u16) = (OP_JEQ << 2) | MODE_NONE,
+    JNE(u16) = (OP_JNE << 2) | MODE_NONE,
+    JLT(u16) = (OP_JLT << 2) | MODE_NONE,
+    JLE(u16) = (OP_JLE << 2) | MODE_NONE,
+    JGT(u16) = (OP_JGT << 2) | MODE_NONE,
+    JGE(u16) = (OP_JGE << 2) | MODE_NONE,
 );
