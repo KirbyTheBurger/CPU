@@ -26,7 +26,10 @@ fn main() {
 
     let mut cpu = CPU::new();
     cpu.load(program);
-    cpu.run(true);
+    if let Err(e) = cpu.run(true) {
+        println!("{e}");
+        return;
+    };
     println!("{:?}", cpu.reg);
 }
 

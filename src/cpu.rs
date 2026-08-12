@@ -36,19 +36,18 @@ impl CPU {
         self.pc = 0;
     }
 
-    pub fn run(&mut self, debug: bool) {
+    pub fn run(&mut self, debug: bool) -> Result<(), String> {
         self.running = true;
 
         while self.running {
-            self.run_instruction();
+            self.run_instruction()?;
 
             if self.pc > CODE_END {
-                println!(
+                self.running = false;
+                return Err(format!(
                     "Program counter exceeds valid code region in memory ({:#X}-{:#X}), aborting program",
                     CODE_START, CODE_END,
-                );
-                self.running = false;
-                return;
+                ));
             }
 
             if debug {
@@ -58,9 +57,11 @@ impl CPU {
                 );
             }
         }
+
+        Ok(())
     }
 
-    fn run_instruction(&mut self) {
+    fn run_instruction(&mut self) -> Result<(), String> {
         use crate::instruction::*;
 
         let byte = self.current();
@@ -172,13 +173,14 @@ impl CPU {
 
                 if jump {
                     self.pc = a;
-                    return;
+                    return Ok(());
                 }
             },
             _ => todo!(),
         }
 
         self.advance();
+        Ok(())
     }
 
     fn next_reg(&mut self) -> u16 {

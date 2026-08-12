@@ -20,7 +20,7 @@ mod tests {
         };
         let mut cpu = CPU::new();
         cpu.load(program);
-        cpu.run(false);
+        cpu.run(false).unwrap();
         cpu
     }
 
