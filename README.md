@@ -50,6 +50,8 @@
 | 0x30   | RSH      | rx, ry    |
 | 0x31   | RSH      | rx, n     |
 | 0x34   | JMP      | l         |
+| 0x38   | CMP      | rx, ry    |
+| 0x39   | CMP      | rx, n     |
 
 **Mnemonics:**  
 | Mnemonic | Meaning |
@@ -68,3 +70,4 @@
 |LSH       |Left shift|
 |RSH       |Right shift|
 |JMP       |Continue execution at a label|
+|CMP       |Compare 2 values and set flags|
