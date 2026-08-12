@@ -32,6 +32,7 @@ pub enum Item {
         kind: JumpKind,
         label: String,
     },
+    UnresolvedCall(String),
 }
 
 pub struct Assembler {
@@ -232,6 +233,14 @@ impl Assembler {
                     _ => Some(Err(Error::InvalidArg)),
                 }
             },
+            "CALL" => {
+                let args = args!(self, 1);
+                let l = ensure!(args[0].clone(), label);
+                Some(Ok(Item::UnresolvedCall(l)))
+            },
+            "RET" => {
+                instr(RET)
+            },
             _ => todo!()
         }
     }
@@ -355,7 +364,10 @@ impl Assembler {
         let mut s = String::new();
 
         loop {
-            let c = self.current()?;
+            let c = match self.current() {
+                Some(c) => c,
+                None => break,
+            };
             if c.is_whitespace() {
                 self.skip_whitespace();
                 break;
@@ -364,7 +376,11 @@ impl Assembler {
             self.advance();
         }
 
-        Some(s)
+        if s.is_empty() {
+            None
+        } else {
+            Some(s)
+        }
     }
 
     fn parse_reg(&mut self) -> Result<u8, Error> {

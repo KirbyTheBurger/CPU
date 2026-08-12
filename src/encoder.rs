@@ -14,7 +14,7 @@ pub fn encode(items: Vec<Item>) -> Result<Vec<u8>, String> {
             Item::Instruction(i) => {
                 adress += i.encode().len() as u16;
             },
-            Item::UnresolvedJump{..} => {
+            Item::UnresolvedJump{..} | Item::UnresolvedCall(_) => {
                 adress += 3;
             }
         }
@@ -41,6 +41,11 @@ pub fn encode(items: Vec<Item>) -> Result<Vec<u8>, String> {
                     JumpKind::JGE => Instruction::JGE(*target),
                 }.encode());
             },
+            Item::UnresolvedCall(label) => {
+                let target = labels.get(&label)
+                    .ok_or_else(|| format!("undefined label: {label}"))?;
+                bytes.extend(Instruction::CALL(*target).encode());
+            }
         }
     }
 

@@ -225,6 +225,17 @@ impl CPU {
                 let n = self.pop()?;
                 self.set_reg(rx, n);
             },
+            OP_CALL => {
+                let a = self.next_u16();
+                self.push(self.pc + 1)?;
+                self.pc = a;
+                return Ok(());
+            },
+            OP_RET => {
+                let a = self.pop()?;
+                self.pc = a;
+                return Ok(());
+            },
             _ => todo!(),
         }
 

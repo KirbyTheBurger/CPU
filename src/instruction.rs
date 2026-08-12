@@ -88,6 +88,8 @@ pub const OP_OUT:  u8 = 21;
 pub const OP_IN:   u8 = 22;
 pub const OP_PUSH: u8 = 23;
 pub const OP_POP:  u8 = 24;
+pub const OP_CALL: u8 = 25;
+pub const OP_RET:  u8 = 26;
 
 pub const MODE_REG:  u8 = 0b00;
 pub const MODE_IMM:  u8 = 0b01;
@@ -144,4 +146,7 @@ instructions!(
     PUSHr(u8) = (OP_PUSH << 2) | MODE_REG,
     PUSHn(u16) = (OP_PUSH << 2) | MODE_IMM,
     POP(u8) = (OP_POP << 2) | MODE_NONE,
+
+    CALL(u16) = (OP_CALL << 2) | MODE_NONE,
+    RET = (OP_RET << 2) | MODE_NONE,
 );

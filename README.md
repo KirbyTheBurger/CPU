@@ -64,6 +64,8 @@
 | 0x5C   | PUSH     | rx        |
 | 0x5D   | PUSH     | n         |
 | 0x60   | POP      | rx        |
+| 0x64   | CALL     | l         |
+| 0x68   | RET      |           |
 
 **Mnemonics:**  
 | Mnemonic | Meaning |
@@ -93,3 +95,5 @@
 |IN        |Wait for a single character input|
 |PUSH      |Push value to stack|
 |POP       |Pop value from stack|
+|CALL      |Call a function|
+|RET       |Return from a function|
