@@ -61,6 +61,9 @@
 | 0x54   | OUT      | rx        |
 | 0x55   | OUT      | n         |
 | 0x58   | IN       | rx        |
+| 0x5C   | PUSH     | rx        |
+| 0x5D   | PUSH     | n         |
+| 0x60   | POP      | rx        |
 
 **Mnemonics:**  
 | Mnemonic | Meaning |
@@ -88,3 +91,5 @@
 |JGE       |Jump if greater than or equal|
 |OUT       |Output a single character|
 |IN        |Wait for a single character input|
+|PUSH      |Push value to stack|
+|POP       |Pop value from stack|
