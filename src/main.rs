@@ -26,7 +26,7 @@ fn main() {
 
     let mut cpu = CPU::new();
     cpu.load(program);
-    if let Err(e) = cpu.run(true) {
+    if let Err(e) = cpu.run(false) {
         println!("{e}");
         return;
     };
