@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{assembler::Item, instruction::Instruction};
+use crate::{assembler::{Item, JumpKind}, instruction::Instruction};
 
 pub fn encode(items: Vec<Item>) -> Result<Vec<u8>, String> {
     let mut labels: HashMap<String, u16> = HashMap::new();
@@ -14,7 +14,7 @@ pub fn encode(items: Vec<Item>) -> Result<Vec<u8>, String> {
             Item::Instruction(i) => {
                 adress += i.encode().len() as u16;
             },
-            Item::UnresolvedJump(_) => {
+            Item::UnresolvedJump{..} => {
                 adress += 3;
             }
         }
@@ -28,10 +28,18 @@ pub fn encode(items: Vec<Item>) -> Result<Vec<u8>, String> {
             Item::Instruction(i) => {
                 bytes.extend(i.encode());
             },
-            Item::UnresolvedJump(s) => {
-                let target = labels.get(&s)
-                    .ok_or_else(|| format!("undefined label: {s}"))?;
-                bytes.extend(Instruction::JMP(*target).encode());
+            Item::UnresolvedJump { kind, label } => {
+                let target = labels.get(&label)
+                    .ok_or_else(|| format!("undefined label: {label}"))?;
+                bytes.extend(match kind {
+                    JumpKind::JMP => Instruction::JMP(*target),
+                    JumpKind::JEQ => Instruction::JEQ(*target),
+                    JumpKind::JNE => Instruction::JNE(*target),
+                    JumpKind::JLT => Instruction::JLT(*target),
+                    JumpKind::JLE => Instruction::JLE(*target),
+                    JumpKind::JGT => Instruction::JGT(*target),
+                    JumpKind::JGE => Instruction::JGE(*target),
+                }.encode());
             },
         }
     }
