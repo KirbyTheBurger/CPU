@@ -67,3 +67,4 @@
 |XOR       |Bitwise XOR|
 |LSH       |Left shift|
 |RSH       |Right shift|
+|JMP       |Continue execution at a label|
