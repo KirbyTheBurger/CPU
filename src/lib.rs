@@ -152,7 +152,6 @@ mod tests {
 
     #[test]
     fn and_register() {
-        // 12 & 10 = 8
         let cpu = run("LD r0, 12 LD r1, 10 AND r0, r1 HLT");
         assert_eq!(cpu.reg[0], 8);
     }
@@ -171,7 +170,6 @@ mod tests {
 
     #[test]
     fn or_register() {
-        // 12 | 10 = 14
         let cpu = run("LD r0, 12 LD r1, 10 OR r0, r1 HLT");
         assert_eq!(cpu.reg[0], 14);
     }
@@ -190,7 +188,6 @@ mod tests {
 
     #[test]
     fn xor_register() {
-        // 12 ^ 10 = 6
         let cpu = run("LD r0, 12 LD r1, 10 XOR r0, r1 HLT");
         assert_eq!(cpu.reg[0], 6);
     }
@@ -475,5 +472,11 @@ mod tests {
             HLT
         ");
         assert_eq!(cpu.reg[0], 5);
+    }
+
+    #[test]
+    #[should_panic]
+    fn out_of_bounds_mem_address() {
+        run("LD r0, [1]");
     }
 }
