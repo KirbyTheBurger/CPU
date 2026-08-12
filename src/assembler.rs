@@ -264,20 +264,43 @@ impl Assembler {
                 },
                 c if c.is_numeric() => {
                     let mut s = String::from(c);
+
+                    let (base, prefix) = if c == '0' {
+                        match self.peek() {
+                            Some('x' | 'X') => (16, true),
+                            Some('b' | 'B') => (2, true),
+                            _ => {
+                                (10, false)
+                            },
+                        }
+                    } else {
+                        (10, false)
+                    };
+
+                    if prefix {
+                        self.advance();
+                        s.clear();
+                    }
+
                     loop {
                         self.advance();
                         let current = match self.current() {
                             Some(c) => c,
                             None => break,
                         };
-                        if current.is_numeric() {
+                        let valid = match base {
+                            16 => current.is_ascii_hexdigit(),
+                            2 => *current == '0' || *current == '1',
+                            _ => current.is_numeric(),
+                        };
+                        if valid {
                             s.push(*current);
                         } else {
                             break;
                         }
                     }
 
-                    let num = match s.parse::<u16>() {
+                    let num = match u16::from_str_radix(&s, base) {
                         Ok(n) => n,
                         Err(_) => return Err(NumAboveCap(s)),
                     };
@@ -359,6 +382,10 @@ impl Assembler {
     fn next(&mut self) -> Option<&char> {
         self.advance();
         self.current()
+    }
+
+    fn peek(&self) -> Option<&char> {
+        self.input.get(self.pos + 1)
     }
 
     fn skip_whitespace(&mut self) {
