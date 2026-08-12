@@ -479,4 +479,100 @@ mod tests {
     fn out_of_bounds_mem_address() {
         run("LD r0, [1]");
     }
+
+    #[test]
+    fn ld_hex_literal() {
+        let cpu = run("LD r0, 0xFF HLT");
+        assert_eq!(cpu.reg[0], 255);
+    }
+
+    #[test]
+    fn ld_hex_literal_lowercase() {
+        let cpu = run("LD r0, 0xff HLT");
+        assert_eq!(cpu.reg[0], 255);
+    }
+
+    #[test]
+    fn ld_hex_literal_mixed_case() {
+        let cpu = run("LD r0, 0xAb12 HLT");
+        assert_eq!(cpu.reg[0], 0xAB12);
+    }
+
+    #[test]
+    fn ld_hex_zero() {
+        let cpu = run("LD r0, 0x0 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
+
+    #[test]
+    fn ld_hex_max_u16() {
+        let cpu = run("LD r0, 0xFFFF HLT");
+        assert_eq!(cpu.reg[0], 65535);
+    }
+
+    #[test]
+    fn ld_hex_single_digit() {
+        let cpu = run("LD r0, 0x5 HLT");
+        assert_eq!(cpu.reg[0], 5);
+    }
+
+    #[test]
+    fn ld_binary_literal() {
+        let cpu = run("LD r0, 0b1010 HLT");
+        assert_eq!(cpu.reg[0], 10);
+    }
+
+    #[test]
+    fn ld_binary_zero() {
+        let cpu = run("LD r0, 0b0 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
+
+    #[test]
+    fn ld_binary_single_bit() {
+        let cpu = run("LD r0, 0b1 HLT");
+        assert_eq!(cpu.reg[0], 1);
+    }
+
+    #[test]
+    fn ld_binary_all_ones_byte() {
+        let cpu = run("LD r0, 0b11111111 HLT");
+        assert_eq!(cpu.reg[0], 255);
+    }
+
+    #[test]
+    fn ld_binary_16_bits() {
+        let cpu = run("LD r0, 0b1111111111111111 HLT");
+        assert_eq!(cpu.reg[0], 65535);
+    }
+
+    #[test]
+    fn ld_decimal_still_works_after_zero() {
+        let cpu = run("LD r0, 0 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
+
+    #[test]
+    fn ld_decimal_normal_number_unaffected() {
+        let cpu = run("LD r0, 42 HLT");
+        assert_eq!(cpu.reg[0], 42);
+    }
+
+    #[test]
+    fn hex_and_decimal_in_same_program() {
+        let cpu = run("LD r0, 0x10 LD r1, 16 CMP r0, r1 HLT");
+        assert_eq!(cpu.flags & 0b1, 0b1);
+    }
+
+    #[test]
+    fn binary_in_arithmetic() {
+        let cpu = run("LD r0, 0b1100 AND r0, 0b1010 HLT");
+        assert_eq!(cpu.reg[0], 0b1000);
+    }
+
+    #[test]
+    fn hex_in_shift() {
+        let cpu = run("LD r0, 0x1 LSH r0, 0x4 HLT");
+        assert_eq!(cpu.reg[0], 16);
+    }
 }
