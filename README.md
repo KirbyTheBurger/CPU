@@ -2,9 +2,9 @@
 **Memory map:**
 |    Region    | Purpose |
 |--------------|---------|
-|0x0000-0x3FFF |Program code|
-|0x4000-0x7FFF |Static memory|
-|0x8000-0xFFFF |Stack    |
+|0x0000-0x3FFF |Program code (16KB)|
+|0x4000-0xFBFF |Static memory (47KB)|
+|0xFC00-0xFFFF |Stack (1KB)|
 
 **Registers:**
 | Register | Internal id | Purpose |
