@@ -156,9 +156,15 @@ impl Assembler {
                     _ => unreachable!()
                 }
             },
-            "NOT" => {
+            "NOT" | "IN" | "POP" => {
                 let rx = ensure!(args!(self, 1)[0], reg);
-                instr(NOT(rx))
+
+                match word {
+                    "NOT" => instr(NOT(rx)),
+                    "IN" => instr(IN(rx)),
+                    "POP" => instr(POP(rx)),
+                    _ => unreachable!(),
+                }
             },
             "AND" | "OR" | "XOR" | "LSH" | "RSH" | "SUB" | "ADD" | "CMP" => {
                 let args = args!(self, 2);
@@ -210,18 +216,21 @@ impl Assembler {
                     label: l,
                 }))
             },
-            "OUT" => {
+            "OUT" | "PUSH" => {
                 let args = args!(self, 1);
                 match args[0] {
-                    Register(rx) => instr(OUTr(rx)),
-                    Number(n) => instr(OUTn(n)),
+                    Register(rx) => match word {
+                        "OUT" => instr(OUTr(rx)),
+                        "PUSH" => instr(PUSHr(rx)),
+                        _ => unreachable!(),
+                    },
+                    Number(n) => match word {
+                        "OUT" => instr(OUTn(n)),
+                        "PUSH" => instr(PUSHn(n)),
+                        _ => unreachable!(),
+                    },
                     _ => Some(Err(Error::InvalidArg)),
                 }
-            },
-            "IN" => {
-                let args = args!(self, 1);
-                let rx = ensure!(args[0], reg);
-                instr(IN(rx))
             },
             _ => todo!()
         }

@@ -12,6 +12,7 @@ pub struct CPU {
     pub reg: [u16; 8],
     pub mem: [u8; 0x10000],
     pub pc: u16,
+    pub sp: u16,
     pub running: bool,
     pub flags: u8,
     terminal: console::Term,
@@ -23,6 +24,7 @@ impl CPU {
             reg: [0; 8],
             mem: [0; _],
             pc: 0,
+            sp: STACK_TOP,
             running: false,
             flags: 0,
             terminal: console::Term::stdout(),
@@ -210,11 +212,42 @@ impl CPU {
                 let ch = self.terminal.read_char().unwrap();
                 self.set_reg(rx, ch as u16);
             },
+            OP_PUSH => {
+                let n = match mode {
+                    MODE_REG => self.next_reg(),
+                    MODE_IMM => self.next_u16(),
+                    _ => unreachable!(),
+                };
+                self.push(n)?;
+            },
+            OP_POP => {
+                let rx = self.next_byte();
+                let n = self.pop()?;
+                self.set_reg(rx, n);
+            },
             _ => todo!(),
         }
 
         self.advance();
         Ok(())
+    }
+
+    fn push(&mut self, n: u16) -> Result<(), String> {
+        if self.sp < STACK_LOW + 2 {
+            return Err("Stack out of bounds".to_string());
+        }
+        self.sp -= 2;
+        self.set_addr(self.sp, n);
+        Ok(())
+    }
+
+    fn pop(&mut self) -> Result<u16, String> {
+        if self.sp > STACK_TOP - 2 {
+            return Err("Attempted to pop from empty stack".to_string());
+        }
+        let n = self.get_addr(self.sp);
+        self.sp += 2;
+        Ok(n)
     }
 
     fn next_reg(&mut self) -> u16 {
@@ -229,9 +262,9 @@ impl CPU {
         self.mem[a.wrapping_add(1) as usize] = b[1];
     }
 
-    fn get_addr(&self, n: u16) -> u16 {
-        let b0 = self.mem[n as usize];
-        let b1 = self.mem[n.wrapping_add(1) as usize];
+    fn get_addr(&self, a: u16) -> u16 {
+        let b0 = self.mem[a as usize];
+        let b1 = self.mem[a.wrapping_add(1) as usize];
 
         u16::from_be_bytes([b0, b1])
     }
