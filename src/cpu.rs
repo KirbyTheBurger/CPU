@@ -14,6 +14,7 @@ pub struct CPU {
     pub pc: u16,
     pub running: bool,
     pub flags: u8,
+    terminal: console::Term,
 }
 
 impl CPU {
@@ -24,6 +25,7 @@ impl CPU {
             pc: 0,
             running: false,
             flags: 0,
+            terminal: console::Term::stdout(),
         }
     }
 
