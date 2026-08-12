@@ -42,6 +42,15 @@ impl CPU {
         while self.running {
             self.run_instruction();
 
+            if self.pc > CODE_END {
+                println!(
+                    "Program counter exceeds valid code region in memory ({:#X}-{:#X}), aborting program",
+                    CODE_START, CODE_END,
+                );
+                self.running = false;
+                return;
+            }
+
             if debug {
                 println!(
                     "registers: {:?}\npc: {}\nrunning: {}\nflags: {:08b}",
