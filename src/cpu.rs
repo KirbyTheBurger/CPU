@@ -204,7 +204,12 @@ impl CPU {
                     None => return Err(format!("{:#X} is not valid ASCII", n))
                 };
                 print!("{ch}");
-            }
+            },
+            OP_IN => {
+                let rx = self.next_byte();
+                let ch = self.terminal.read_char().unwrap();
+                self.set_reg(rx, ch as u16);
+            },
             _ => todo!(),
         }
 

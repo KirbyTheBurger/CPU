@@ -218,6 +218,11 @@ impl Assembler {
                     _ => Some(Err(Error::InvalidArg)),
                 }
             },
+            "IN" => {
+                let args = args!(self, 1);
+                let rx = ensure!(args[0], reg);
+                instr(IN(rx))
+            },
             _ => todo!()
         }
     }
