@@ -86,11 +86,21 @@ impl CPU {
                     },
                     MODE_MEM => {
                         let a = self.next_u16();
+                        if a < DATA_START || a > DATA_END {
+                            return Err(format!(
+                                "Attempted to load value from out of bounds memory adress {:#X}", a
+                            ));
+                        }
                         let n = self.get_addr(a);
                         self.set_reg(rx, n);
                     },
                     MODE_IND => {
                         let a = self.next_reg();
+                        if a < DATA_START || a > DATA_END {
+                            return Err(format!(
+                                "Attempted to load value from out of bounds memory adress {:#X}", a
+                            ));
+                        }
                         let n = self.get_addr(a);
                         self.set_reg(rx, n);
                     },
@@ -99,6 +109,11 @@ impl CPU {
             },
             OP_ST => {
                 let a = self.next_reg();
+                if a < DATA_START || a > DATA_END {
+                    return Err(format!(
+                        "Attempted to store value at out of bounds memory adress {:#X}", a
+                    ));
+                }
                 let n = self.next_reg();
                 self.set_addr(a, n);
             },
