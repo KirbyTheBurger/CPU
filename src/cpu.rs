@@ -138,9 +138,23 @@ impl CPU {
                 if n1 == n2 { self.flags |= FLAG_ZERO };
                 if n1 < n2 { self.flags |= FLAG_LT };
             },
-            OP_JMP => {
+            OP_JMP | OP_JEQ | OP_JNE | OP_JLT | OP_JLE | OP_JGT | OP_JGE => {
                 let a = self.next_u16();
-                self.pc = a;
+                let zero = self.flags & FLAG_ZERO == FLAG_ZERO;
+                let lt = self.flags & FLAG_LT == FLAG_LT;
+
+                let jump = match op {
+                    OP_JMP => true,
+                    OP_JEQ => zero,
+                    OP_JNE => !zero,
+                    OP_JLT => lt,
+                    OP_JLE => lt || zero,
+                    OP_JGT => !lt && !zero,
+                    OP_JGE => !lt,
+                    _ => unreachable!(),
+                };
+
+                if jump { self.pc = a; }
                 return;
             },
             _ => todo!(),
