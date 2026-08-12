@@ -113,6 +113,10 @@ impl CPU {
                     _ => unreachable!(),
                 });
             },
+            OP_JMP => {
+                let a = self.next_u16();
+                self.pc = a;
+            },
             _ => todo!(),
         }
 
