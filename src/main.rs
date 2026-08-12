@@ -1,22 +1,27 @@
 use std::io::stdin;
 
-use cpu::{assembler::Assembler, cpu::CPU, encoder::Encoder};
+use cpu::{assembler::Assembler, cpu::CPU, encoder::encode};
 
 fn main() {
     let input = get_input();
     
     let mut assembler = Assembler::new(input);
-    let instructions = match assembler.process() {
+    let items = match assembler.process() {
         Ok(i) => i,
         Err(e) => {
             println!("An error ocurred while parsing the assembly: {e}");
             return;
         },
     };
-    println!("{:?}", instructions);
+    println!("{:?}", items);
 
-    let mut encoder = Encoder::new(instructions);
-    let program = encoder.encode();
+    let program = match encode(items) {
+        Ok(v) => v,
+        Err(e) => {
+            println!("An error occured during enocding: {e}");
+            return;
+        },
+    };
     println!("{:?}", program);
 
     let mut cpu = CPU::new();

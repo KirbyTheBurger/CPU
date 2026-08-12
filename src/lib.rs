@@ -6,16 +6,18 @@ pub mod encoder;
 
 #[cfg(test)]
 mod tests {
-    use crate::{assembler::Assembler, cpu::CPU, encoder::Encoder};
+    use crate::{assembler::Assembler, cpu::CPU, encoder::encode};
 
     fn run(code: &str) -> CPU {
         let mut asm = Assembler::new(code.to_string());
-        let instr = match asm.process() {
+        let items = match asm.process() {
             Ok(i) => i,
             Err(e) => panic!("{e}"),
         };
-        let mut encoder = Encoder::new(instr);
-        let program = encoder.encode();
+        let program = match encode(items) {
+            Ok(v) => v,
+            Err(e) => panic!("{e}"),
+        };
         let mut cpu = CPU::new();
         cpu.load(program);
         cpu.run(false);
