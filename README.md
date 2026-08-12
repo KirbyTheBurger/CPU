@@ -52,6 +52,12 @@
 | 0x34   | JMP      | l         |
 | 0x38   | CMP      | rx, ry    |
 | 0x39   | CMP      | rx, n     |
+| 0x3C   | JEQ      | l         |
+| 0x40   | JNE      | l         |
+| 0x44   | JLT      | l         |
+| 0x48   | JLE      | l         |
+| 0x4C   | JGT      | l         |
+| 0x50   | JGE      | l         |
 
 **Mnemonics:**  
 | Mnemonic | Meaning |
@@ -71,3 +77,9 @@
 |RSH       |Right shift|
 |JMP       |Continue execution at a label|
 |CMP       |Compare 2 values and set flags|
+|JEQ       |Jump if equal|
+|JNE       |Jump if not equal|
+|JLT       |Jump if less than|
+|JLE       |Jump if less than or equal|
+|JGT       |Jump if greater than|
+|JGE       |Jump if greater than or equal|
