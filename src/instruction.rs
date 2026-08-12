@@ -63,29 +63,31 @@ macro_rules! instructions {
     };
 }
 
-pub const OP_HLT: u8 = 0;
-pub const OP_LD:  u8 = 1;
-pub const OP_ST:  u8 = 2;
-pub const OP_ADD: u8 = 3;
-pub const OP_SUB: u8 = 4;
-pub const OP_MUL: u8 = 5;
-pub const OP_DIV: u8 = 6;
-pub const OP_NOT: u8 = 7;
-pub const OP_AND: u8 = 8;
-pub const OP_OR:  u8 = 9;
-pub const OP_XOR: u8 = 10;
-pub const OP_LSH: u8 = 11;
-pub const OP_RSH: u8 = 12;
-pub const OP_JMP: u8 = 13;
-pub const OP_CMP: u8 = 14;
-pub const OP_JEQ: u8 = 15;
-pub const OP_JNE: u8 = 16;
-pub const OP_JLT: u8 = 17;
-pub const OP_JLE: u8 = 18;
-pub const OP_JGT: u8 = 19;
-pub const OP_JGE: u8 = 20;
-pub const OP_OUT: u8 = 21;
-pub const OP_IN:  u8 = 22;
+pub const OP_HLT:  u8 = 0;
+pub const OP_LD:   u8 = 1;
+pub const OP_ST:   u8 = 2;
+pub const OP_ADD:  u8 = 3;
+pub const OP_SUB:  u8 = 4;
+pub const OP_MUL:  u8 = 5;
+pub const OP_DIV:  u8 = 6;
+pub const OP_NOT:  u8 = 7;
+pub const OP_AND:  u8 = 8;
+pub const OP_OR:   u8 = 9;
+pub const OP_XOR:  u8 = 10;
+pub const OP_LSH:  u8 = 11;
+pub const OP_RSH:  u8 = 12;
+pub const OP_JMP:  u8 = 13;
+pub const OP_CMP:  u8 = 14;
+pub const OP_JEQ:  u8 = 15;
+pub const OP_JNE:  u8 = 16;
+pub const OP_JLT:  u8 = 17;
+pub const OP_JLE:  u8 = 18;
+pub const OP_JGT:  u8 = 19;
+pub const OP_JGE:  u8 = 20;
+pub const OP_OUT:  u8 = 21;
+pub const OP_IN:   u8 = 22;
+pub const OP_PUSH: u8 = 23;
+pub const OP_POP:  u8 = 24;
 
 pub const MODE_REG:  u8 = 0b00;
 pub const MODE_IMM:  u8 = 0b01;
@@ -138,4 +140,8 @@ instructions!(
     OUTr(u8) = (OP_OUT << 2) | MODE_REG,
     OUTn(u16) = (OP_OUT << 2) | MODE_IMM,
     IN(u8) = (OP_IN << 2) | MODE_NONE,
+
+    PUSHr(u8) = (OP_PUSH << 2) | MODE_REG,
+    PUSHn(u16) = (OP_PUSH << 2) | MODE_IMM,
+    POP(u8) = (OP_POP << 2) | MODE_NONE,
 );
