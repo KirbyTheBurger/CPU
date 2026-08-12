@@ -1,34 +1,40 @@
-use crate::instruction::Instruction;
+use std::collections::HashMap;
 
-pub struct Encoder {
-    input: Vec<Instruction>,
-    pos: usize,
-}
+use crate::{assembler::Item, instruction::Instruction};
 
-impl Encoder {
-    pub fn new(input: Vec<Instruction>) -> Encoder {
-        Encoder {
-            input,
-            pos: 0,
+pub fn encode(items: Vec<Item>) -> Result<Vec<u8>, String> {
+    let mut labels: HashMap<String, u16> = HashMap::new();
+    let mut adress: u16 = 0;
+
+    for item in &items {
+        match item {
+            Item::Label(s) => {
+                labels.insert(s.clone(), adress);
+            },
+            Item::Instruction(i) => {
+                adress += i.encode().len() as u16;
+            },
+            Item::UnresolvedJump(_) => {
+                adress += 3;
+            }
         }
     }
 
-    pub fn encode(&mut self) -> Vec<u8> {
-        let mut bytes = vec![];
+    let mut bytes = vec![];
 
-        while let Some(i) = self.current() {
-            bytes.extend(i.encode());
-            self.advance();
+    for item in items {
+        match item {
+            Item::Label(_) => {},
+            Item::Instruction(i) => {
+                bytes.extend(i.encode());
+            },
+            Item::UnresolvedJump(s) => {
+                let target = labels.get(&s)
+                    .ok_or_else(|| format!("undefined label: {s}"))?;
+                bytes.extend(Instruction::JMP(*target).encode());
+            },
         }
-
-        bytes
     }
 
-    fn advance(&mut self) {
-        self.pos += 1;
-    }
-
-    fn current(&self) -> Option<&Instruction> {
-        self.input.get(self.pos)
-    }
+    Ok(bytes)
 }
