@@ -4,17 +4,19 @@ use crate::{error::Error::{self, *}, instruction::Instruction::{self, *}};
 
 use Operand::*;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum Operand {
     Register(u8),
     Number(u16),
     RegAdress(u8),
     Adress(u16),
+    Label(String),
 }
 
 pub enum Item {
     Instruction(Instruction),
     Label(String),
+    UnresolvedJump(String),
 }
 
 pub struct Assembler {
@@ -37,6 +39,7 @@ macro_rules! args {
     - reg: throws `ExpectedReg`
     - num: throws `ExpectedNum`
     - regaddr: throws `ExpectedRegAddr`
+    - label: throws `ExpectedLabel`
 */
 macro_rules! ensure {
     ($arg:expr, reg) => {
@@ -57,6 +60,13 @@ macro_rules! ensure {
         match $arg {
             RegAdress(x) => x,
             _ => return throw(ExpectedRegAddr),
+        }
+    };
+
+    ($arg:expr, label) => {
+        match $arg {
+            Label(x) => x,
+            _ => return throw(ExpectedLabel),
         }
     };
 }
@@ -107,6 +117,7 @@ impl Assembler {
                     Number(n) => instr(LDrn(rx, n)),
                     RegAdress(ry) => instr(LDrar(rx, ry)),
                     Adress(n) => instr(LDran(rx, n)),
+                    _ => unreachable!(),
                 }
             },
             "HLT" => {
@@ -162,6 +173,11 @@ impl Assembler {
                     _ => throw(InvalidArg),
                 }
             },
+            "JMP" => {
+                let args = args!(self, 1);
+                let l = ensure!(args[0].clone(), label);
+                Some(Ok(Item::UnresolvedJump(l)))
+            },
             _ => todo!()
         }
     }
@@ -187,7 +203,7 @@ impl Assembler {
                 },
                 '[' => {
                     self.advance();
-                    let addr = self.parse_args(1)?[0];
+                    let addr = self.parse_args(1)?[0].clone();
 
                     match self.current() {
                         Some(']') => self.advance(),
@@ -221,6 +237,21 @@ impl Assembler {
                         Err(_) => return Err(NumAboveCap(s)),
                     };
                     args.push(Number(num));
+                },
+                c if c.is_alphabetic() || c == '_' => {
+                    let mut s = String::from(c);
+                    loop {
+                        self.advance();
+                        let current = match self.current() {
+                            Some(c) => c,
+                            None => break,
+                        };
+                        if current.is_alphabetic() || *current == '_' {
+                            s.push(*current);
+                        } else {
+                            break;
+                        }
+                    }
                 },
                 _ => return Err(InvalidArg),
             }
@@ -309,6 +340,7 @@ impl Display for Operand {
             Number(n) => write!(f, "{n}"),
             RegAdress(r) => write!(f, "[r{r}]"),
             Adress(n) => write!(f, "[{n}]"),
+            Label(s) => write!(f, "{s}"),
         }
     }
 }
