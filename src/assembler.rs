@@ -13,6 +13,7 @@ pub enum Operand {
     Label(String),
 }
 
+#[derive(Debug)]
 pub enum Item {
     Instruction(Instruction),
     Label(String),
@@ -252,6 +253,8 @@ impl Assembler {
                             break;
                         }
                     }
+
+                    args.push(Label(s));
                 },
                 _ => return Err(InvalidArg),
             }
