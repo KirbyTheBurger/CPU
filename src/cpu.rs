@@ -154,8 +154,10 @@ impl CPU {
                     _ => unreachable!(),
                 };
 
-                if jump { self.pc = a; }
-                return;
+                if jump {
+                    self.pc = a;
+                    return;
+                }
             },
             _ => todo!(),
         }
