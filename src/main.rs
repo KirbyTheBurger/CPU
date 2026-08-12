@@ -27,7 +27,7 @@ fn main() {
     let mut cpu = CPU::new();
     cpu.load(program);
     cpu.run(false);
-
+    println!("{:?}", cpu.reg);
 }
 
 fn get_input() -> String {
