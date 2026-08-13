@@ -68,6 +68,8 @@
 | 0x68   | RET      |           |
 | 0x6C   | LDS      | rx, n     |
 | 0x70   | STS      | n, rx     |
+| 0x74   | INC      | rx        |
+| 0x78   | DEC      | rx        |
 
 **Mnemonics:**  
 | Mnemonic | Meaning |
@@ -101,3 +103,5 @@
 |RET       |Return from a function|
 |LDS       |Load value into register relative to SP|
 |STS       |Store value in stack memory relative to SP|
+|INC       |Increment register by 1|
+|DEC       |Decrement register by 1|

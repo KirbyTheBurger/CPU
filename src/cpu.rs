@@ -255,6 +255,14 @@ impl CPU {
                 let a = self.sp + offset;
                 self.set_addr(a, n);
             },
+            OP_INC | OP_DEC => {
+                let rx = self.next_byte();
+                match op {
+                    OP_INC => self.reg[rx as usize] += 1,
+                    OP_DEC => self.reg[rx as usize] -= 1,
+                    _ => unreachable!(),
+                }
+            },
             _ => todo!(),
         }
 

@@ -92,6 +92,8 @@ pub const OP_CALL: u8 = 25;
 pub const OP_RET:  u8 = 26;
 pub const OP_LDS:  u8 = 27;
 pub const OP_STS:  u8 = 28;
+pub const OP_INC:  u8 = 29;
+pub const OP_DEC:  u8 = 30;
 
 pub const MODE_REG:  u8 = 0b00;
 pub const MODE_IMM:  u8 = 0b01;
@@ -154,4 +156,7 @@ instructions!(
 
     LDS(u8, u16) = (OP_LDS << 2) | MODE_NONE,
     STS(u16, u8) = (OP_STS << 2) | MODE_NONE,
+
+    INC(u8) = (OP_INC << 2) | MODE_NONE,
+    DEC(u8) = (OP_INC << 2) | MODE_NONE,
 );

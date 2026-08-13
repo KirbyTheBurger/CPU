@@ -157,13 +157,15 @@ impl Assembler {
                     _ => unreachable!()
                 }
             },
-            "NOT" | "IN" | "POP" => {
+            "NOT" | "IN" | "POP" | "INC" | "DEC" => {
                 let rx = ensure!(args!(self, 1)[0], reg);
 
                 match word {
                     "NOT" => instr(NOT(rx)),
                     "IN" => instr(IN(rx)),
                     "POP" => instr(POP(rx)),
+                    "INC" => instr(INC(rx)),
+                    "DEC" => instr(DEC(rx)),
                     _ => unreachable!(),
                 }
             },
