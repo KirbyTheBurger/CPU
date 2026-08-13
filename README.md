@@ -7,11 +7,11 @@
 |0xFC00-0xFFFF |Stack (1KB)|
 
 **Registers:**
-| Register | Internal id | Purpose |
-|----------|-------------|---------|
-|r0-r7     |0x00-0x07    |General purpose registers|
-|pc        |0x08         |Program counter|
-|sp        |0x09         |Stack pointer|
+| Register | Purpose |
+|----------|---------|
+|r0-r7     |General purpose registers|
+|pc        |Program counter|
+|sp        |Stack pointer|
 
 # Instructions  
 **Operands:**  
