@@ -66,6 +66,8 @@
 | 0x60   | POP      | rx        |
 | 0x64   | CALL     | l         |
 | 0x68   | RET      |           |
+| 0x6C   | LDS      | rx, n     |
+| 0x70   | STS      | n, rx     |
 
 **Mnemonics:**  
 | Mnemonic | Meaning |
@@ -97,3 +99,5 @@
 |POP       |Pop value from stack|
 |CALL      |Call a function|
 |RET       |Return from a function|
+|LDS       |Load value into register relative to SP|
+|STS       |Store value in stack memory relative to SP|

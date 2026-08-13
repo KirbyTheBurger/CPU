@@ -236,6 +236,25 @@ impl CPU {
                 self.pc = a;
                 return Ok(());
             },
+            OP_LDS => {
+                let rx = self.next_byte();
+                let offset = self.next_u16();
+                if self.sp > STACK_TOP - offset {
+                    return Err("LDS adress out of bounds".to_string());
+                }
+                let a = self.sp + offset;
+                let n = self.get_addr(a);
+                self.set_reg(rx, n);
+            },
+            OP_STS => {
+                let offset = self.next_u16();
+                let n = self.next_reg();
+                if self.sp > STACK_TOP - offset {
+                    return Err("STS adress out of bounds".to_string());
+                }
+                let a = self.sp + offset;
+                self.set_addr(a, n);
+            },
             _ => todo!(),
         }
 

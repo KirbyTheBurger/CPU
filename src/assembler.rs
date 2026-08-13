@@ -241,6 +241,18 @@ impl Assembler {
             "RET" => {
                 instr(RET)
             },
+            "LDS" => {
+                let args = args!(self, 2);
+                let rx = ensure!(args[0], reg);
+                let n = ensure!(args[1], num);
+                instr(LDS(rx, n))
+            },
+            "STS" => {
+                let args = args!(self, 2);
+                let n = ensure!(args[0], num);
+                let rx = ensure!(args[1], reg);
+                instr(STS(n, rx))
+            },
             _ => todo!()
         }
     }

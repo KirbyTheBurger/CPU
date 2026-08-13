@@ -90,6 +90,8 @@ pub const OP_PUSH: u8 = 23;
 pub const OP_POP:  u8 = 24;
 pub const OP_CALL: u8 = 25;
 pub const OP_RET:  u8 = 26;
+pub const OP_LDS:  u8 = 27;
+pub const OP_STS:  u8 = 28;
 
 pub const MODE_REG:  u8 = 0b00;
 pub const MODE_IMM:  u8 = 0b01;
@@ -149,4 +151,7 @@ instructions!(
 
     CALL(u16) = (OP_CALL << 2) | MODE_NONE,
     RET = (OP_RET << 2) | MODE_NONE,
+
+    LDS(u8, u16) = (OP_CALL << 2) | MODE_NONE,
+    STS(u16, u8) = (OP_CALL << 2) | MODE_NONE,
 );
