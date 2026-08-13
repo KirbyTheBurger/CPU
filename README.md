@@ -71,6 +71,8 @@
 | 0x74   | INC      | rx        |
 | 0x78   | DEC      | rx        |
 | 0x7C   | MOD      | rx, ry    |
+| 0x80   | JC       | l         |
+| 0x84   | JNC      | l         |
 
 **Mnemonics:**  
 | Mnemonic | Meaning |
@@ -107,3 +109,5 @@
 |INC       |Increment register by 1|
 |DEC       |Decrement register by 1|
 |MOD       |Modulo operator|
+|JC        |Jump if carry flag is set|
+|JNC       |Jump if carry flag is not set|

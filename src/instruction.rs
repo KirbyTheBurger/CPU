@@ -95,6 +95,8 @@ pub const OP_STS:  u8 = 28;
 pub const OP_INC:  u8 = 29;
 pub const OP_DEC:  u8 = 30;
 pub const OP_MOD:  u8 = 31;
+pub const OP_JC:   u8 = 32;
+pub const OP_JNC:  u8 = 33;
 
 pub const MODE_REG:  u8 = 0b00;
 pub const MODE_IMM:  u8 = 0b01;
@@ -161,4 +163,7 @@ instructions!(
 
     INC(u8) = (OP_INC << 2) | MODE_NONE,
     DEC(u8) = (OP_DEC << 2) | MODE_NONE,
+
+    JC(u16) = (OP_JC << 2) | MODE_NONE,
+    JNC(u16) = (OP_JNC << 2) | MODE_NONE,
 );

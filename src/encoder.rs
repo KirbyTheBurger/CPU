@@ -39,6 +39,8 @@ pub fn encode(items: Vec<Item>) -> Result<Vec<u8>, String> {
                     JumpKind::JLE => Instruction::JLE(*target),
                     JumpKind::JGT => Instruction::JGT(*target),
                     JumpKind::JGE => Instruction::JGE(*target),
+                    JumpKind::JC => Instruction::JC(*target),
+                    JumpKind::JNC => Instruction::JNC(*target),
                 }.encode());
             },
             Item::UnresolvedCall(label) => {

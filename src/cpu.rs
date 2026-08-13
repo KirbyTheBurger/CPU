@@ -228,6 +228,21 @@ impl CPU {
                     return Ok(());
                 }
             },
+            OP_JC | OP_JNC => {
+                let a = self.next_u16();
+                let carry = self.flags & FLAG_CARRY == FLAG_CARRY;
+                
+                let jump = match op {
+                    OP_JC => carry,
+                    OP_JNC => !carry,
+                    _ => unreachable!(),
+                };
+
+                if jump {
+                    self.pc = a;
+                    return Ok(());
+                }
+            },
             OP_OUT => {
                 let n = match mode {
                     MODE_REG => self.next_reg(),

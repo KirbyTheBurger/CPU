@@ -22,6 +22,8 @@ pub enum JumpKind {
     JLE,
     JGT,
     JGE,
+    JC,
+    JNC,
 }
 
 #[derive(Debug)]
@@ -200,7 +202,7 @@ impl Assembler {
                     _ => throw(InvalidArg),
                 }
             },
-            "JMP" | "JEQ" | "JNE" | "JLT" | "JLE" | "JGT" | "JGE" => {
+            "JMP" | "JEQ" | "JNE" | "JLT" | "JLE" | "JGT" | "JGE" | "JC" | "JNC" => {
                 let args = args!(self, 1);
                 let l = ensure!(args[0].clone(), label);
 
@@ -212,6 +214,8 @@ impl Assembler {
                     "JLE" => JumpKind::JLE,
                     "JGT" => JumpKind::JGT,
                     "JGE" => JumpKind::JGE,
+                    "JC"  => JumpKind::JC,
+                    "JNC" => JumpKind::JNC,
                     _ => unreachable!(),
                 };
 
