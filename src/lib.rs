@@ -829,4 +829,73 @@ mod tests {
         ");
         assert_eq!(cpu.reg[1], 55);
     }
+
+    #[test]
+    fn inc_basic() {
+        let cpu = run("LD r0, 5 INC r0 HLT");
+        assert_eq!(cpu.reg[0], 6);
+    }
+
+    #[test]
+    fn inc_from_zero() {
+        let cpu = run("LD r0, 0 INC r0 HLT");
+        assert_eq!(cpu.reg[0], 1);
+    }
+
+    #[test]
+    fn inc_multiple_times() {
+        let cpu = run("LD r0, 0 INC r0 INC r0 INC r0 HLT");
+        assert_eq!(cpu.reg[0], 3);
+    }
+
+    #[test]
+    fn inc_does_not_affect_other_registers() {
+        let cpu = run("LD r0, 1 LD r1, 1 INC r0 HLT");
+        assert_eq!(cpu.reg[0], 2);
+        assert_eq!(cpu.reg[1], 1);
+    }
+
+    #[test]
+    fn dec_basic() {
+        let cpu = run("LD r0, 5 DEC r0 HLT");
+        assert_eq!(cpu.reg[0], 4);
+    }
+
+    #[test]
+    fn dec_to_zero() {
+        let cpu = run("LD r0, 1 DEC r0 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
+
+    #[test]
+    fn dec_multiple_times() {
+        let cpu = run("LD r0, 5 DEC r0 DEC r0 DEC r0 HLT");
+        assert_eq!(cpu.reg[0], 2);
+    }
+
+    #[test]
+    fn dec_does_not_affect_other_registers() {
+        let cpu = run("LD r0, 5 LD r1, 5 DEC r0 HLT");
+        assert_eq!(cpu.reg[0], 4);
+        assert_eq!(cpu.reg[1], 5);
+    }
+
+    #[test]
+    fn inc_dec_cancel_out() {
+        let cpu = run("LD r0, 10 INC r0 DEC r0 HLT");
+        assert_eq!(cpu.reg[0], 10);
+    }
+
+    #[test]
+    fn inc_used_as_loop_counter() {
+        let cpu = run("
+            LD r0, 0
+            LD r1, 5
+            loop: INC r0
+            CMP r0, r1
+            JLT loop
+            HLT
+        ");
+        assert_eq!(cpu.reg[0], 5);
+    }
 }
