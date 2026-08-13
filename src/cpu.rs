@@ -1,5 +1,6 @@
-const FLAG_ZERO: u8 = 0b0000_0001;
-const FLAG_LT: u8 = 0b0000_0010;
+const FLAG_ZERO: u8 =  0b0000_0001;
+const FLAG_LT: u8 =    0b0000_0010;
+const FLAG_CARRY: u8 = 0b0000_0100;
 
 pub const CODE_START: u16 = 0x0000;
 pub const CODE_END: u16   = 0x3FFF;
@@ -131,14 +132,47 @@ impl CPU {
                 let n1 = self.get_reg(rx);
                 let n2 = self.next_reg();
 
-                self.set_reg(rx, match op {
-                    OP_MUL => n1 * n2,
-                    OP_DIV => n1 / n2,
-                    OP_MOD => n1 % n2,
+                let result = match op {
+                    OP_MUL => {
+                        let (result, carry) = n1.overflowing_mul(n2);
+                        self.flags &= !FLAG_CARRY;
+                        if carry { self.flags |= FLAG_CARRY };
+                        result
+                    },
+                    OP_DIV => {
+                        match n1.checked_div(n2) {
+                            Some(n) => n,
+                            None => return Err(format!("Attempted to divide {n1} by zero"))
+                        }
+                    },
+                    OP_MOD => {
+                        if n2 == 0 {
+                            return Err(format!("Attempted to modulo {n1} by zero"));
+                        }
+                        n1 % n2
+                    },
                     _ => unreachable!(),
-                });
+                };
+                self.set_reg(rx, result);
             },
-            OP_ADD | OP_SUB | OP_AND..=OP_RSH => {
+            OP_SUB | OP_ADD => {
+                let rx = self.next_byte();
+                let n1 = self.get_reg(rx);
+                let n2 = match mode {
+                    MODE_IMM => self.next_u16(),
+                    MODE_REG => self.next_reg(),
+                    _ => unreachable!(),
+                };
+                let (result, carry) = match op {
+                    OP_ADD => n1.overflowing_add(n2),
+                    OP_SUB => n1.overflowing_sub(n2),
+                    _ => unreachable!(),
+                };
+                self.flags &= !FLAG_CARRY;
+                if carry { self.flags |= FLAG_CARRY };
+                self.set_reg(rx, result);
+            },
+            OP_AND | OP_OR | OP_XOR | OP_LSH | OP_RSH => {
                 let rx = self.next_byte();
                 let n1 = self.get_reg(rx);
                 let n2 = match mode {
@@ -148,8 +182,6 @@ impl CPU {
                 };
 
                 self.set_reg(rx, match op {
-                    OP_ADD => n1 + n2,
-                    OP_SUB => n1 - n2,
                     OP_AND => n1 & n2,
                     OP_OR => n1 | n2,
                     OP_XOR => n1 ^ n2,
@@ -171,7 +203,7 @@ impl CPU {
                     _ => unreachable!(),
                 };
 
-                self.flags = 0;
+                self.flags &= !(FLAG_ZERO & FLAG_LT);
                 if n1 == n2 { self.flags |= FLAG_ZERO };
                 if n1 < n2 { self.flags |= FLAG_LT };
             },
@@ -258,11 +290,14 @@ impl CPU {
             },
             OP_INC | OP_DEC => {
                 let rx = self.next_byte();
-                match op {
-                    OP_INC => self.reg[rx as usize] += 1,
-                    OP_DEC => self.reg[rx as usize] -= 1,
+                let (result, carry) = match op {
+                    OP_INC => self.reg[rx as usize].overflowing_add(1),
+                    OP_DEC => self.reg[rx as usize].overflowing_sub(1),
                     _ => unreachable!(),
-                }
+                };
+                self.flags &= !FLAG_CARRY;
+                if carry { self.flags |= FLAG_CARRY };
+                self.set_reg(rx, result);
             },
             _ => todo!(),
         }
