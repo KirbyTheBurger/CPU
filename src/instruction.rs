@@ -158,5 +158,5 @@ instructions!(
     STS(u16, u8) = (OP_STS << 2) | MODE_NONE,
 
     INC(u8) = (OP_INC << 2) | MODE_NONE,
-    DEC(u8) = (OP_INC << 2) | MODE_NONE,
+    DEC(u8) = (OP_DEC << 2) | MODE_NONE,
 );
