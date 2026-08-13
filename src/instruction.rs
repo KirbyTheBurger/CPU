@@ -152,6 +152,6 @@ instructions!(
     CALL(u16) = (OP_CALL << 2) | MODE_NONE,
     RET = (OP_RET << 2) | MODE_NONE,
 
-    LDS(u8, u16) = (OP_CALL << 2) | MODE_NONE,
-    STS(u16, u8) = (OP_CALL << 2) | MODE_NONE,
+    LDS(u8, u16) = (OP_LDS << 2) | MODE_NONE,
+    STS(u16, u8) = (OP_STS << 2) | MODE_NONE,
 );
