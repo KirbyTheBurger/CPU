@@ -898,4 +898,58 @@ mod tests {
         ");
         assert_eq!(cpu.reg[0], 5);
     }
+
+    #[test]
+    fn mod_basic() {
+        let cpu = run("LD r0, 10 LD r1, 3 MOD r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 1);
+    }
+
+    #[test]
+    fn mod_no_remainder() {
+        let cpu = run("LD r0, 10 LD r1, 5 MOD r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
+
+    #[test]
+    fn mod_by_larger_number() {
+        let cpu = run("LD r0, 3 LD r1, 10 MOD r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 3);
+    }
+
+    #[test]
+    fn mod_by_one() {
+        let cpu = run("LD r0, 42 LD r1, 1 MOD r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
+
+    #[test]
+    fn mod_self() {
+        let cpu = run("LD r0, 7 LD r1, 7 MOD r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
+
+    #[test]
+    fn mod_zero_dividend() {
+        let cpu = run("LD r0, 0 LD r1, 5 MOD r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
+
+    #[test]
+    fn mod_does_not_affect_divisor_register() {
+        let cpu = run("LD r0, 10 LD r1, 3 MOD r0, r1 HLT");
+        assert_eq!(cpu.reg[1], 3);
+    }
+
+    #[test]
+    fn mod_used_for_even_odd_check() {
+        let cpu = run("LD r0, 7 LD r1, 2 MOD r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 1);
+    }
+
+    #[test]
+    fn mod_used_for_even_odd_check_even() {
+        let cpu = run("LD r0, 8 LD r1, 2 MOD r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
 }
