@@ -952,4 +952,118 @@ mod tests {
         let cpu = run("LD r0, 8 LD r1, 2 MOD r0, r1 HLT");
         assert_eq!(cpu.reg[0], 0);
     }
+
+    #[test]
+    fn add_no_overflow_clears_carry() {
+        let cpu = run("LD r0, 5 ADD r0, 3 HLT");
+        assert_eq!(cpu.flags & 0b100, 0);
+    }
+
+    #[test]
+    fn add_overflow_sets_carry() {
+        let cpu = run("LD r0, 65535 ADD r0, 1 HLT");
+        assert_eq!(cpu.flags & 0b100, 0b100);
+    }
+
+    #[test]
+    fn add_overflow_wraps_result() {
+        let cpu = run("LD r0, 65535 ADD r0, 1 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
+
+    #[test]
+    fn sub_no_underflow_clears_carry() {
+        let cpu = run("LD r0, 10 SUB r0, 3 HLT");
+        assert_eq!(cpu.flags & 0b100, 0);
+    }
+
+    #[test]
+    fn sub_underflow_sets_carry() {
+        let cpu = run("LD r0, 0 SUB r0, 1 HLT");
+        assert_eq!(cpu.flags & 0b100, 0b100);
+    }
+
+    #[test]
+    fn sub_underflow_wraps_result() {
+        let cpu = run("LD r0, 0 SUB r0, 1 HLT");
+        assert_eq!(cpu.reg[0], 65535);
+    }
+
+    #[test]
+    fn mul_no_overflow_clears_carry() {
+        let cpu = run("LD r0, 6 LD r1, 7 MUL r0, r1 HLT");
+        assert_eq!(cpu.flags & 0b100, 0);
+    }
+
+    #[test]
+    fn mul_overflow_sets_carry() {
+        let cpu = run("LD r0, 65535 LD r1, 2 MUL r0, r1 HLT");
+        assert_eq!(cpu.flags & 0b100, 0b100);
+    }
+
+    #[test]
+    fn mul_overflow_wraps_result() {
+        let cpu = run("LD r0, 65535 LD r1, 2 MUL r0, r1 HLT");
+        assert_eq!(cpu.reg[0], 65534);
+    }
+
+    #[test]
+    #[should_panic]
+    fn div_by_zero_errors() {
+        run("LD r0, 10 LD r1, 0 DIV r0, r1 HLT");
+    }
+
+    #[test]
+    #[should_panic]
+    fn mod_by_zero_errors() {
+        run("LD r0, 10 LD r1, 0 MOD r0, r1 HLT");
+    }
+
+    #[test]
+    fn inc_no_overflow_clears_carry() {
+        let cpu = run("LD r0, 5 INC r0 HLT");
+        assert_eq!(cpu.flags & 0b100, 0);
+    }
+
+    #[test]
+    fn inc_overflow_sets_carry() {
+        let cpu = run("LD r0, 65535 INC r0 HLT");
+        assert_eq!(cpu.flags & 0b100, 0b100);
+    }
+
+    #[test]
+    fn inc_overflow_wraps_result() {
+        let cpu = run("LD r0, 65535 INC r0 HLT");
+        assert_eq!(cpu.reg[0], 0);
+    }
+
+    #[test]
+    fn dec_no_underflow_clears_carry() {
+        let cpu = run("LD r0, 5 DEC r0 HLT");
+        assert_eq!(cpu.flags & 0b100, 0);
+    }
+
+    #[test]
+    fn dec_underflow_sets_carry() {
+        let cpu = run("LD r0, 0 DEC r0 HLT");
+        assert_eq!(cpu.flags & 0b100, 0b100);
+    }
+
+    #[test]
+    fn dec_underflow_wraps_result() {
+        let cpu = run("LD r0, 0 DEC r0 HLT");
+        assert_eq!(cpu.reg[0], 65535);
+    }
+
+    #[test]
+    fn carry_cleared_by_subsequent_non_overflowing_op() {
+        let cpu = run("LD r0, 65535 ADD r0, 1 LD r0, 1 ADD r0, 1 HLT");
+        assert_eq!(cpu.flags & 0b100, 0);
+    }
+
+    #[test]
+    fn carry_does_not_affect_zero_or_lt_flags() {
+        let cpu = run("LD r0, 5 LD r1, 5 CMP r0, r1 LD r2, 65535 ADD r2, 1 HLT");
+        assert_eq!(cpu.flags & 0b1, 0b1);
+    }
 }
