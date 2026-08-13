@@ -6,7 +6,7 @@ pub mod encoder;
 
 #[cfg(test)]
 mod tests {
-    use crate::{assembler::Assembler, cpu::CPU, encoder::encode};
+    use crate::{assembler::Assembler, cpu::{CPU, STACK_TOP}, encoder::encode};
 
     fn run(code: &str) -> CPU {
         let mut asm = Assembler::new(code.to_string());
@@ -744,5 +744,89 @@ mod tests {
             inc: ADD r0, 1 RET
         ");
         assert_eq!(cpu.reg[0], 3);
+    }
+
+    #[test]
+    fn lds_reads_pushed_value() {
+        let cpu = run("PUSH 42 LDS r0, 0 HLT");
+        assert_eq!(cpu.reg[0], 42);
+    }
+
+    #[test]
+    fn lds_reads_correct_offset_with_two_pushes() {
+        let cpu = run("PUSH 1 PUSH 2 LDS r0, 0 LDS r1, 2 HLT");
+        assert_eq!(cpu.reg[0], 2);
+        assert_eq!(cpu.reg[1], 1);
+    }
+
+    #[test]
+    fn lds_does_not_modify_sp() {
+        let cpu = run("PUSH 5 LDS r0, 0 HLT");
+        assert_eq!(cpu.sp, STACK_TOP - 2);
+    }
+
+    #[test]
+    fn sts_writes_value_readable_by_lds() {
+        let cpu = run("PUSH 0 LD r0, 77 STS 0, r0 LDS r1, 0 HLT");
+        assert_eq!(cpu.reg[1], 77);
+    }
+
+    #[test]
+    fn sts_overwrites_existing_value() {
+        let cpu = run("PUSH 1 LD r0, 99 STS 0, r0 LDS r1, 0 HLT");
+        assert_eq!(cpu.reg[1], 99);
+    }
+
+    #[test]
+    fn sts_does_not_modify_sp() {
+        let cpu = run("PUSH 5 LD r0, 1 STS 0, r0 HLT");
+        assert_eq!(cpu.sp, STACK_TOP - 2);
+    }
+
+    #[test]
+    fn lds_with_zero_offset() {
+        let cpu = run("PUSH 123 LDS r0, 0 HLT");
+        assert_eq!(cpu.reg[0], 123);
+    }
+
+    #[test]
+    fn lds_sts_roundtrip_multiple_values() {
+        let cpu = run("
+            PUSH 10
+            PUSH 20
+            PUSH 30
+            LDS r0, 0
+            LDS r1, 2
+            LDS r2, 4
+            HLT
+        ");
+        assert_eq!(cpu.reg[0], 30);
+        assert_eq!(cpu.reg[1], 20);
+        assert_eq!(cpu.reg[2], 10);
+    }
+
+    #[test]
+    #[should_panic]
+    fn lds_out_of_bounds_offset_errors() {
+        run("PUSH 1 LDS r0, 65000 HLT");
+    }
+
+    #[test]
+    #[should_panic]
+    fn sts_out_of_bounds_offset_errors() {
+        run("PUSH 1 LD r0, 1 STS 65000, r0 HLT");
+    }
+
+    #[test]
+    fn lds_after_call_reads_caller_pushed_arg() {
+        let cpu = run("
+            LD r0, 55
+            PUSH r0
+            CALL func
+            HLT
+            func: LDS r1, 2
+            RET
+        ");
+        assert_eq!(cpu.reg[1], 55);
     }
 }
