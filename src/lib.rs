@@ -1066,4 +1066,40 @@ mod tests {
         let cpu = run("LD r0, 5 LD r1, 5 CMP r0, r1 LD r2, 65535 ADD r2, 1 HLT");
         assert_eq!(cpu.flags & 0b1, 0b1);
     }
+
+    #[test]
+    fn jc_taken_when_carry_set() {
+        let cpu = run("LD r0, 65535 ADD r0, 1 JC target LD r1, 99 target: HLT");
+        assert_eq!(cpu.reg[1], 0);
+    }
+
+    #[test]
+    fn jc_not_taken_when_carry_clear() {
+        let cpu = run("LD r0, 5 ADD r0, 3 JC target LD r1, 99 target: HLT");
+        assert_eq!(cpu.reg[1], 99);
+    }
+
+    #[test]
+    fn jnc_taken_when_carry_clear() {
+        let cpu = run("LD r0, 5 ADD r0, 3 JNC target LD r1, 99 target: HLT");
+        assert_eq!(cpu.reg[1], 0);
+    }
+
+    #[test]
+    fn jnc_not_taken_when_carry_set() {
+        let cpu = run("LD r0, 65535 ADD r0, 1 JNC target LD r1, 99 target: HLT");
+        assert_eq!(cpu.reg[1], 99);
+    }
+
+    #[test]
+    fn jc_after_sub_underflow() {
+        let cpu = run("LD r0, 0 SUB r0, 1 JC target LD r1, 99 target: HLT");
+        assert_eq!(cpu.reg[1], 0);
+    }
+
+    #[test]
+    fn jc_after_mul_overflow() {
+        let cpu = run("LD r0, 65535 LD r1, 2 MUL r0, r1 JC target LD r2, 99 target: HLT");
+        assert_eq!(cpu.reg[2], 0);
+    }
 }
