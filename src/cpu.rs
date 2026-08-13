@@ -126,7 +126,7 @@ impl CPU {
                 let n = self.get_reg(rx);
                 self.set_reg(rx, !n);
             },
-            OP_MUL | OP_DIV => {
+            OP_MUL | OP_DIV | OP_MOD => {
                 let rx = self.next_byte();
                 let n1 = self.get_reg(rx);
                 let n2 = self.next_reg();
@@ -134,6 +134,7 @@ impl CPU {
                 self.set_reg(rx, match op {
                     OP_MUL => n1 * n2,
                     OP_DIV => n1 / n2,
+                    OP_MOD => n1 % n2,
                     _ => unreachable!(),
                 });
             },

@@ -70,6 +70,7 @@
 | 0x70   | STS      | n, rx     |
 | 0x74   | INC      | rx        |
 | 0x78   | DEC      | rx        |
+| 0x7C   | MOD      | rx, ry    |
 
 **Mnemonics:**  
 | Mnemonic | Meaning |
@@ -105,3 +106,4 @@
 |STS       |Store value in stack memory relative to SP|
 |INC       |Increment register by 1|
 |DEC       |Decrement register by 1|
+|MOD       |Modulo operator|

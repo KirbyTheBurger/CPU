@@ -94,6 +94,7 @@ pub const OP_LDS:  u8 = 27;
 pub const OP_STS:  u8 = 28;
 pub const OP_INC:  u8 = 29;
 pub const OP_DEC:  u8 = 30;
+pub const OP_MOD:  u8 = 31;
 
 pub const MODE_REG:  u8 = 0b00;
 pub const MODE_IMM:  u8 = 0b01;
@@ -115,8 +116,9 @@ instructions!(
     ADDrn(u8, u16) = (OP_ADD << 2) | MODE_IMM,
     SUBrr(u8, u8)  = (OP_SUB << 2) | MODE_REG,
     SUBrn(u8, u16) = (OP_SUB << 2) | MODE_IMM,
-    MUL(u8, u8)    = (OP_MUL << 2) | MODE_REG,
-    DIV(u8, u8)    = (OP_DIV << 2) | MODE_REG,
+    MUL(u8, u8)    = (OP_MUL << 2) | MODE_NONE,
+    DIV(u8, u8)    = (OP_DIV << 2) | MODE_NONE,
+    MOD(u8, u8)    = (OP_MOD << 2) | MODE_NONE,
 
     NOT(u8) = (OP_NOT << 2) | MODE_NONE,
 

@@ -146,7 +146,7 @@ impl Assembler {
 
                 instr(ST(rx, ry))
             },
-            "MUL" | "DIV" => {
+            "MUL" | "DIV" | "MOD" => {
                 let args = args!(self, 2);
                 let rx = ensure!(args[0], reg);
                 let ry = ensure!(args[1], reg);
@@ -154,6 +154,7 @@ impl Assembler {
                 match word {
                     "MUL" => instr(MUL(rx, ry)),
                     "DIV" => instr(DIV(rx, ry)),
+                    "MOD" => instr(MOD(rx, ry)),
                     _ => unreachable!()
                 }
             },
