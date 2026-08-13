@@ -203,7 +203,7 @@ impl CPU {
                     _ => unreachable!(),
                 };
 
-                self.flags &= !(FLAG_ZERO & FLAG_LT);
+                self.flags &= !(FLAG_ZERO | FLAG_LT);
                 if n1 == n2 { self.flags |= FLAG_ZERO };
                 if n1 < n2 { self.flags |= FLAG_LT };
             },
